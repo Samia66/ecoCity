@@ -1,0 +1,37 @@
+<div class="eco-container eco-settings-page">
+  <eco-page-header
+    title="Mon profil"
+    subtitle="Gérez vos informations personnelles"
+    icon="person"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Paramètres' }, { label: 'Profil' }]"
+  />
+
+  <eco-card>
+    <div class="eco-settings-profile__avatar-row">
+      <div class="eco-settings-profile__avatar">{{ initials() }}</div>
+      <div>
+        <h4>{{ user()?.firstName }} {{ user()?.lastName }}</h4>
+        <span>{{ user()?.role }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="eco-form-row">
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Prénom</mat-label>
+          <input matInput formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="lastName" />
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" />
+        <mat-hint>L'email ne peut pas être modifié</mat-hint>
+      </mat-form-field>
+      <eco-button type="submit" [loading]="saving()">Enregistrer les modifications</eco-button>
+    </form>
+  </eco-card>
+</div>

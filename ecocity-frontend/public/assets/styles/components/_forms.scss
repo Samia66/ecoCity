@@ -1,0 +1,32 @@
+@use "../abstracts/colors" as *;
+@use "../abstracts/spacing" as *;
+
+.eco-form-field {
+  width: 100%;
+  margin-bottom: $space-4;
+}
+
+.eco-form-row {
+  display: flex;
+  gap: $space-4;
+
+  .eco-form-field { flex: 1; }
+}
+
+.eco-form-error {
+  color: $danger;
+  font-size: 12px;
+  margin-top: $space-1;
+}
+
+.eco-form-backend-error {
+  background: $danger-light;
+  color: $danger;
+  border-radius: $radius-md;
+  padding: $space-3 $space-4;
+  font-size: 13px;
+  margin-bottom: $space-4;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}

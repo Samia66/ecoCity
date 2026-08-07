@@ -1,0 +1,49 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+
+.eco-settings-page {
+  max-width: 640px;
+}
+
+.eco-settings-profile__avatar-row {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-6;
+  padding-bottom: $space-5;
+  border-bottom: 1px solid $border;
+
+  h4 { font-size: 15px; font-weight: 600; }
+  span { font-size: 12px; color: $text-secondary; }
+}
+
+.eco-settings-profile__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: $primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.eco-preference-card {
+  margin-top: $space-5;
+  display: block;
+}
+
+.eco-preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-3 0;
+  border-bottom: 1px solid $border;
+
+  &:last-child { border-bottom: none; }
+
+  h5 { font-size: 13px; font-weight: 600; }
+  span { font-size: 12px; color: $text-secondary; }
+}

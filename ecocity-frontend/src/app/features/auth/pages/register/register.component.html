@@ -1,0 +1,38 @@
+<div class="eco-auth-split">
+  <div class="eco-auth-split__brand">
+    <div class="eco-auth-split__brand-content">
+      <div class="eco-auth-split__logo">🌿</div>
+      <h1>Rejoignez EcoCity</h1>
+      <p>Créez votre compte pour signaler, suivre et résoudre les problèmes urbains de votre ville.</p>
+      <ul class="eco-auth-split__features">
+        <li><mat-icon>check_circle</mat-icon> Inscription gratuite et rapide</li>
+        <li><mat-icon>check_circle</mat-icon> Suivi personnalisé de vos signalements</li>
+        <li><mat-icon>check_circle</mat-icon> Notifications en temps réel</li>
+      </ul>
+    </div>
+    <div class="eco-auth-split__blob"></div>
+  </div>
+
+  <div class="eco-auth-split__form">
+    <div class="eco-auth-split__form-card">
+      <h2>Créer un compte</h2>
+      <p class="eco-auth-split__subtitle">Rejoignez la plateforme EcoCity en quelques secondes</p>
+
+      @if (backendError()) {
+        <div class="eco-form-backend-error"><mat-icon>error_outline</mat-icon><span>{{ backendError() }}</span></div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="eco-form-row">
+          <eco-input label="Prénom" formControlName="firstName" [errorMessage]="f.firstName.touched && f.firstName.invalid ? 'Requis' : ''" />
+          <eco-input label="Nom" formControlName="lastName" [errorMessage]="f.lastName.touched && f.lastName.invalid ? 'Requis' : ''" />
+        </div>
+        <eco-input label="Adresse email" type="email" prefixIcon="mail_outline" formControlName="email" [errorMessage]="f.email.touched && f.email.invalid ? 'Email invalide' : ''" />
+        <eco-password-input label="Mot de passe" formControlName="password" [errorMessage]="f.password.touched && f.password.invalid ? '6 caractères minimum' : ''" />
+        <eco-button type="submit" [loading]="loading()" [block]="true">Créer mon compte</eco-button>
+      </form>
+
+      <p class="eco-auth-split__footer">Déjà un compte ? <a routerLink="/login">Se connecter</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Matrice des permissions"
+    subtitle="Attribuez les permissions à chaque rôle de la plateforme"
+    icon="lock_person"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Rôles', route: '/roles' }, { label: 'Permissions' }]"
+  >
+    <eco-button icon="save" [loading]="saving()" (click)="save()">Enregistrer</eco-button>
+  </eco-page-header>
+
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement de la matrice..." />
+  } @else {
+    <eco-card [padding]="0">
+      <div class="eco-table-wrapper">
+        <table class="eco-table eco-permission-matrix">
+          <thead>
+            <tr>
+              <th>Permission</th>
+              @for (role of roles(); track role.id) { <th>{{ role.name }}</th> }
+            </tr>
+          </thead>
+          <tbody>
+            @for (module of modules; track module) {
+              <tr class="eco-permission-matrix__module-row">
+                <td [attr.colspan]="roles().length + 1">{{ module }}</td>
+              </tr>
+              @for (permission of permissionsForModule(module); track permission.id) {
+                <tr>
+                  <td>{{ permission.label }}</td>
+                  @for (role of roles(); track role.id) {
+                    <td class="eco-permission-matrix__checkbox">
+                      <mat-checkbox [checked]="isChecked(role.id, permission.code)" (change)="toggle(role.id, permission.code)"></mat-checkbox>
+                    </td>
+                  }
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </eco-card>
+  }
+</div>

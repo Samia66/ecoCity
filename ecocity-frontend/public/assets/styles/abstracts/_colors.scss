@@ -1,0 +1,43 @@
+// ==========================================================================
+// EcoCity — Palette de couleurs
+// ==========================================================================
+
+$primary: #16A34A;
+$primary-dark: #15803D;
+$primary-light: #DCFCE7;
+
+$secondary: #2563EB;
+$secondary-light: #DBEAFE;
+
+$warning: #F59E0B;
+$warning-light: #FEF3C7;
+$success: #22C55E;
+$success-light: #DCFCE7;
+$danger: #EF4444;
+$danger-light: #FEE2E2;
+$info: #0EA5E9;
+$info-light: #E0F2FE;
+
+$surface: #FFFFFF;
+$background: #F8FAFC;
+$text-primary: #0F172A;
+$text-secondary: #64748B;
+$text-disabled: #94A3B8;
+$border: #E2E8F0;
+$border-dark: #CBD5E1;
+
+// Statuts des signalements
+$status-nouveau: #64748B;
+$status-en-attente: #F59E0B;
+$status-valide: #2563EB;
+$status-assigne: #7C3AED;
+$status-en-cours: #0EA5E9;
+$status-resolu: #22C55E;
+$status-rejete: #EF4444;
+$status-archive: #94A3B8;
+
+// Priorités
+$priority-basse: #94A3B8;
+$priority-moyenne: #2563EB;
+$priority-haute: #F59E0B;
+$priority-critique: #EF4444;

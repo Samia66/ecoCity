@@ -1,0 +1,59 @@
+<div class="eco-auth-split">
+  <div class="eco-auth-split__brand">
+    <div class="eco-auth-split__brand-content">
+      <div class="eco-auth-split__logo">🌿</div>
+      <h1>EcoCity</h1>
+      <p>Plateforme intelligente de gestion des signalements urbains pour les municipalités et collectivités locales.</p>
+
+      <ul class="eco-auth-split__features">
+        <li><mat-icon>check_circle</mat-icon> Suivi en temps réel des signalements</li>
+        <li><mat-icon>check_circle</mat-icon> Cartographie des incidents urbains</li>
+        <li><mat-icon>check_circle</mat-icon> Pilotage des interventions terrain</li>
+        <li><mat-icon>check_circle</mat-icon> Statistiques et tableaux de bord</li>
+      </ul>
+    </div>
+    <div class="eco-auth-split__blob"></div>
+  </div>
+
+  <div class="eco-auth-split__form">
+    <div class="eco-auth-split__form-card">
+      <h2>Connexion</h2>
+      <p class="eco-auth-split__subtitle">Accédez à votre espace de gestion EcoCity</p>
+
+      @if (backendError()) {
+        <div class="eco-form-backend-error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ backendError() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <eco-input
+          label="Adresse email"
+          type="email"
+          placeholder="vous&#64;mairie.fr"
+          prefixIcon="mail_outline"
+          formControlName="email"
+          [errorMessage]="f.email.touched && f.email.invalid ? 'Adresse email valide requise' : ''"
+        />
+
+        <eco-password-input
+          label="Mot de passe"
+          formControlName="password"
+          [errorMessage]="f.password.touched && f.password.invalid ? '6 caractères minimum' : ''"
+        />
+
+        <div class="eco-auth-split__row">
+          <mat-checkbox formControlName="remember">Se souvenir de moi</mat-checkbox>
+          <a routerLink="/forgot-password">Mot de passe oublié ?</a>
+        </div>
+
+        <eco-button type="submit" [loading]="loading()" [block]="true">Se connecter</eco-button>
+      </form>
+
+      <p class="eco-auth-split__footer">
+        Pas encore de compte ? <a routerLink="/register">Créer un compte</a>
+      </p>
+    </div>
+  </div>
+</div>

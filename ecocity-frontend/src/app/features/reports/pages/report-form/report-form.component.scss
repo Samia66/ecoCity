@@ -1,0 +1,54 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+
+.eco-report-form {
+  max-width: 720px;
+}
+
+.eco-report-form__upload {
+  margin-bottom: $space-6;
+}
+
+.eco-report-form__upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+  border: 2px dashed $border-dark;
+  border-radius: $radius-lg;
+  padding: $space-8;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+
+  &:hover { border-color: $primary; background: $primary-light; color: $primary-dark; }
+
+  mat-icon { font-size: 28px; width: 28px; height: 28px; }
+  span { font-size: 13px; font-weight: 500; }
+}
+
+.eco-report-form__file-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-top: $space-3;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    background: $background;
+    border-radius: $radius-md;
+    padding: $space-2 $space-3;
+    font-size: 13px;
+
+    span { flex: 1; }
+    button { background: none; border: none; cursor: pointer; color: $text-secondary; display: flex; }
+  }
+}
+
+.eco-report-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}

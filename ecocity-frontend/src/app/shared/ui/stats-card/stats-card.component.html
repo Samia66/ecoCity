@@ -1,0 +1,15 @@
+<div class="eco-stats-card eco-card eco-card--hover">
+  <div class="eco-stats-card__icon" [class]="'eco-stats-card__icon--' + color">
+    <mat-icon>{{ icon }}</mat-icon>
+  </div>
+  <div class="eco-stats-card__body">
+    <span class="eco-stats-card__title">{{ title }}</span>
+    <span class="eco-stats-card__value">{{ value }}</span>
+    @if (trend) {
+      <span class="eco-stats-card__trend" [class.eco-stats-card__trend--down]="!trendUp">
+        <mat-icon>{{ trendUp ? 'trending_up' : 'trending_down' }}</mat-icon>
+        {{ trend }}
+      </span>
+    }
+  </div>
+</div>

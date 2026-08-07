@@ -1,0 +1,17 @@
+<div class="eco-container eco-settings-page">
+  <eco-page-header
+    title="Sécurité"
+    subtitle="Modifiez votre mot de passe"
+    icon="lock"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Paramètres' }, { label: 'Sécurité' }]"
+  />
+
+  <eco-card>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <eco-password-input label="Mot de passe actuel" formControlName="currentPassword" [errorMessage]="f.currentPassword.touched && f.currentPassword.invalid ? 'Requis' : ''" />
+      <eco-password-input label="Nouveau mot de passe" formControlName="newPassword" [errorMessage]="f.newPassword.touched && f.newPassword.invalid ? '6 caractères minimum' : ''" />
+      <eco-password-input label="Confirmer le nouveau mot de passe" formControlName="confirmPassword" />
+      <eco-button type="submit" [loading]="saving()">Mettre à jour le mot de passe</eco-button>
+    </form>
+  </eco-card>
+</div>

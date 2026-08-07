@@ -1,0 +1,21 @@
+@use "../abstracts/colors" as *;
+@use "../abstracts/spacing" as *;
+
+.eco-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+.eco-card--hover {
+  transition: box-shadow .15s ease, transform .15s ease;
+  &:hover { box-shadow: $shadow-md; transform: translateY(-2px); }
+}
+
+.eco-panel {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: $space-6;
+}

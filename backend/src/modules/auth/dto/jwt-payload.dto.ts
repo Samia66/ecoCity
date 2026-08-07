@@ -5,4 +5,5 @@ export class JwtPayloadDto {
     email!: string;
     role!: RoleName;
     organizationId!: string;
+    permissions?: string[];
 }

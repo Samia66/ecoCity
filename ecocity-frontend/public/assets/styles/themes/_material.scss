@@ -1,0 +1,20 @@
+@use "../abstracts/colors" as *;
+
+// Overrides légers de Material Design pour coller à l'identité EcoCity
+:root {
+  --mat-sys-primary: #{$primary};
+  --eco-radius: 10px;
+}
+
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: #{$primary};
+}
+
+.mat-mdc-outlined-button.mat-primary {
+  --mdc-outlined-button-label-text-color: #{$primary};
+}
+
+.mdc-tab-indicator__content--underline {
+  border-color: $primary !important;
+}

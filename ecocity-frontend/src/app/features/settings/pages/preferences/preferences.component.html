@@ -1,0 +1,42 @@
+<div class="eco-container eco-settings-page">
+  <eco-page-header
+    title="Préférences"
+    subtitle="Personnalisez votre expérience EcoCity"
+    icon="tune"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Paramètres' }, { label: 'Préférences' }]"
+  />
+
+  <eco-card title="Apparence">
+    <div class="eco-preference-row">
+      <div>
+        <h5>Mode sombre</h5>
+        <span>Basculer entre le thème clair et sombre</span>
+      </div>
+      <mat-slide-toggle [checked]="darkMode()" (change)="toggleDarkMode()"></mat-slide-toggle>
+    </div>
+  </eco-card>
+
+  <eco-card title="Notifications" class="eco-preference-card">
+    <div class="eco-preference-row">
+      <div>
+        <h5>Notifications par email</h5>
+        <span>Recevoir un email pour chaque changement de statut</span>
+      </div>
+      <mat-slide-toggle [checked]="emailNotifications()" (change)="emailNotifications.set($event.checked); notify()"></mat-slide-toggle>
+    </div>
+    <div class="eco-preference-row">
+      <div>
+        <h5>Notifications push</h5>
+        <span>Recevoir des notifications dans l'application</span>
+      </div>
+      <mat-slide-toggle [checked]="pushNotifications()" (change)="pushNotifications.set($event.checked); notify()"></mat-slide-toggle>
+    </div>
+    <div class="eco-preference-row">
+      <div>
+        <h5>Rapport hebdomadaire</h5>
+        <span>Recevoir un résumé chaque lundi matin</span>
+      </div>
+      <mat-slide-toggle [checked]="weeklyReport()" (change)="weeklyReport.set($event.checked); notify()"></mat-slide-toggle>
+    </div>
+  </eco-card>
+</div>

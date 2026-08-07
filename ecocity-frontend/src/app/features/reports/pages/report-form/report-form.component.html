@@ -1,0 +1,72 @@
+<div class="eco-container eco-report-form">
+  <eco-page-header
+    title="Nouveau signalement"
+    subtitle="Décrivez le problème urbain constaté"
+    icon="add_alert"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Signalements', route: '/reports' }, { label: 'Nouveau' }]"
+  />
+
+  <eco-card>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Titre du signalement</mat-label>
+        <input matInput formControlName="title" placeholder="Ex : Dépôt sauvage rue des Palmiers" />
+        @if (f.title.touched && f.title.invalid) { <mat-error>Le titre est requis</mat-error> }
+      </mat-form-field>
+
+      <div class="eco-form-row">
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Catégorie</mat-label>
+          <mat-select formControlName="category">
+            @for (cat of categories; track cat) { <mat-option [value]="cat">{{ cat }}</mat-option> }
+          </mat-select>
+          @if (f.category.touched && f.category.invalid) { <mat-error>La catégorie est requise</mat-error> }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Priorité</mat-label>
+          <mat-select formControlName="priority">
+            @for (p of priorities; track p) { <mat-option [value]="p">{{ p }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Adresse</mat-label>
+        <input matInput formControlName="address" placeholder="Rue, quartier, ville" />
+        @if (f.address.touched && f.address.invalid) { <mat-error>L'adresse est requise</mat-error> }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="4" formControlName="description" placeholder="Décrivez précisément le problème constaté..."></textarea>
+        @if (f.description.touched && f.description.invalid) { <mat-error>10 caractères minimum</mat-error> }
+      </mat-form-field>
+
+      <div class="eco-report-form__upload">
+        <label class="eco-report-form__upload-zone">
+          <mat-icon>cloud_upload</mat-icon>
+          <span>Ajouter des photos (avant / après)</span>
+          <input type="file" multiple accept="image/*" (change)="onFilesSelected($event)" hidden />
+        </label>
+
+        @if (selectedFiles().length) {
+          <ul class="eco-report-form__file-list">
+            @for (file of selectedFiles(); track file.name; let i = $index) {
+              <li>
+                <mat-icon>image</mat-icon>
+                <span>{{ file.name }}</span>
+                <button type="button" (click)="removeFile(i)"><mat-icon>close</mat-icon></button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="eco-report-form__actions">
+        <eco-button variant="outlined" routerLink="/reports" type="button">Annuler</eco-button>
+        <eco-button type="submit" [loading]="submitting()">Créer le signalement</eco-button>
+      </div>
+    </form>
+  </eco-card>
+</div>

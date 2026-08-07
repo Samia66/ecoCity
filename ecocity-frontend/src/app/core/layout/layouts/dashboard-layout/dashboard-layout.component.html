@@ -1,0 +1,16 @@
+<div class="eco-dashboard-layout">
+  <eco-sidebar
+    [collapsed]="collapsed()"
+    [mobileOpen]="mobileOpen()"
+    (closeMobile)="mobileOpen.set(false)"
+  />
+  <div class="eco-dashboard-layout__main">
+    <eco-navbar
+      (toggleSidebar)="toggleSidebar()"
+      (toggleMobileSidebar)="toggleMobileSidebar()"
+    />
+    <main class="eco-dashboard-layout__content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

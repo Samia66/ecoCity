@@ -5,4 +5,6 @@ export interface JwtPayload {
   sub: string;
   role: RoleName;
   organizationId: string;
+  permissions ?: string[];
+
 }

@@ -1,0 +1,62 @@
+<header class="eco-navbar">
+  <div class="eco-navbar__left">
+    <button mat-icon-button class="eco-btn-icon eco-navbar__menu-desktop" (click)="toggleSidebar.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-icon-button class="eco-btn-icon eco-navbar__menu-mobile" (click)="toggleMobileSidebar.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="eco-navbar__search">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Rechercher un signalement, un utilisateur..." [(ngModel)]="searchTerm" />
+    </div>
+  </div>
+
+  <div class="eco-navbar__right">
+    <button mat-icon-button class="eco-btn-icon" (click)="toggleDarkMode()" matTooltip="Mode sombre">
+      <mat-icon>{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    <button mat-icon-button class="eco-btn-icon" [matMenuTriggerFor]="notifMenu" matBadge="3" matBadgeColor="warn" matBadgeSize="small">
+      <mat-icon>notifications</mat-icon>
+    </button>
+    <mat-menu #notifMenu="matMenu" class="eco-navbar__notif-menu">
+      <div class="eco-navbar__notif-item">
+        <strong>Nouveau signalement</strong>
+        <span>Nid-de-poule signalé rue des Palmiers</span>
+      </div>
+      <div class="eco-navbar__notif-item">
+        <strong>Intervention terminée</strong>
+        <span>Éclairage public réparé - Zone 4</span>
+      </div>
+      <div class="eco-navbar__notif-item">
+        <strong>Agent assigné</strong>
+        <span>Une intervention vous a été assignée</span>
+      </div>
+    </mat-menu>
+
+    <button class="eco-navbar__profile" [matMenuTriggerFor]="profileMenu">
+      <div class="eco-navbar__avatar">{{ fullName().charAt(0) || 'U' }}</div>
+      <div class="eco-navbar__profile-info">
+        <span class="eco-navbar__profile-name">{{ fullName() || 'Utilisateur' }}</span>
+        <span class="eco-navbar__profile-role">{{ user()?.role }}</span>
+      </div>
+      <mat-icon>expand_more</mat-icon>
+    </button>
+    <mat-menu #profileMenu="matMenu">
+      <button mat-menu-item routerLink="/settings/profile">
+        <mat-icon>person</mat-icon>
+        <span>Mon profil</span>
+      </button>
+      <button mat-menu-item routerLink="/settings/security">
+        <mat-icon>lock</mat-icon>
+        <span>Sécurité</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Déconnexion</span>
+      </button>
+    </mat-menu>
+  </div>
+</header>

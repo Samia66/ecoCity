@@ -1,0 +1,22 @@
+<div class="eco-auth-centered">
+  <div class="eco-auth-centered__card">
+    <div class="eco-auth-centered__logo">🌿</div>
+
+    @switch (status()) {
+      @case ('loading') {
+        <h2>Vérification en cours</h2>
+        <eco-loading-spinner label="Validation de votre adresse email..." />
+      }
+      @case ('success') {
+        <h2>Email vérifié ✅</h2>
+        <p class="eco-auth-centered__subtitle">Votre adresse email a bien été confirmée. Vous pouvez maintenant vous connecter.</p>
+        <a routerLink="/login" class="eco-auth-centered__link-block"><eco-button [block]="true">Se connecter</eco-button></a>
+      }
+      @case ('error') {
+        <h2>Lien invalide</h2>
+        <p class="eco-auth-centered__subtitle">Ce lien de vérification est invalide ou a expiré.</p>
+        <a routerLink="/login" class="eco-auth-centered__link-block"><eco-button [block]="true" variant="outlined">Retour à la connexion</eco-button></a>
+      }
+    }
+  </div>
+</div>

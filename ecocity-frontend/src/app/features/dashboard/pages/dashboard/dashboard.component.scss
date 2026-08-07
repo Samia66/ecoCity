@@ -1,0 +1,85 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+@use "abstracts/breakpoints" as *;
+@use "abstracts/typography" as *;
+
+.eco-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-6;
+  flex-wrap: wrap;
+  gap: $space-3;
+
+  h1 { font-size: $fs-2xl; font-weight: 700; }
+  p { color: $text-secondary; font-size: 13px; margin-top: 2px; }
+}
+
+.eco-dashboard-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-5;
+  margin-bottom: $space-6;
+
+  @include tablet { grid-template-columns: repeat(2, 1fr); }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.eco-dashboard-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-5;
+  margin-bottom: $space-6;
+
+  @include tablet-down { grid-template-columns: 1fr; }
+}
+
+.eco-chart-container {
+  height: 300px;
+  position: relative;
+
+  &--doughnut { height: 280px; }
+}
+
+.eco-dashboard-bottom {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: $space-5;
+  margin-bottom: $space-6;
+
+  @include tablet-down { grid-template-columns: 1fr; }
+}
+
+.eco-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.eco-timeline__item {
+  display: flex;
+  gap: $space-3;
+}
+
+.eco-timeline__dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $primary-light;
+  color: $primary-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.eco-timeline__content {
+  p { font-size: 13px; line-height: 1.5; }
+  span { font-size: 11px; color: $text-secondary; }
+}
+
+.eco-dashboard-map {
+  margin-bottom: $space-6;
+}

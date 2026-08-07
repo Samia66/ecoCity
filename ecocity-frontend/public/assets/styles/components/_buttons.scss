@@ -1,0 +1,18 @@
+@use "../abstracts/colors" as *;
+@use "../abstracts/spacing" as *;
+
+.eco-btn {
+  border-radius: $radius-md;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.eco-btn--block { width: 100%; display: flex; }
+
+.eco-btn-icon {
+  border-radius: $radius-full;
+  color: $text-secondary;
+
+  &:hover { background: $background; color: $text-primary; }
+}

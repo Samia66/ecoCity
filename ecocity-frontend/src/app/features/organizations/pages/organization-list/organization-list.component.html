@@ -1,0 +1,29 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Organisations"
+    subtitle="Municipalités et collectivités locales utilisant EcoCity"
+    icon="apartment"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Organisations' }]"
+  >
+    <eco-button icon="add" (click)="openCreate()">Nouvelle organisation</eco-button>
+  </eco-page-header>
+
+  <eco-data-table
+    [columns]="columns"
+    [data]="organizations()"
+    [loading]="loading()"
+    emptyTitle="Aucune organisation"
+    emptyDescription="Créez la première organisation pour commencer."
+    (rowClick)="openEdit($event)"
+  >
+    <ng-template #actionsTemplate let-organization>
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="openEdit(organization)"><mat-icon>edit</mat-icon><span>Modifier</span></button>
+        <button mat-menu-item (click)="remove(organization, $event)"><mat-icon color="warn">delete</mat-icon><span>Supprimer</span></button>
+      </mat-menu>
+    </ng-template>
+  </eco-data-table>
+</div>

@@ -1,0 +1,59 @@
+@use "../abstracts/colors" as *;
+@use "../abstracts/spacing" as *;
+@use "../abstracts/typography" as *;
+
+.eco-table-wrapper {
+  overflow-x: auto;
+  border-radius: $radius-lg;
+  border: 1px solid $border;
+  background: $surface;
+}
+
+table.eco-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: $background;
+    color: $text-secondary;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    padding: $space-3 $space-4;
+    text-align: left;
+    border-bottom: 1px solid $border;
+    z-index: 1;
+  }
+
+  tbody td {
+    padding: $space-4;
+    border-bottom: 1px solid $border;
+    font-size: $fs-base;
+  }
+
+  tbody tr { transition: background .1s ease; }
+  tbody tr:hover { background: $background; }
+  tbody tr:last-child td { border-bottom: none; }
+}
+
+.eco-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: $radius-full;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+}

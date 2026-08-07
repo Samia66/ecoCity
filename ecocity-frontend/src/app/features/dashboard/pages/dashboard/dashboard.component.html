@@ -1,0 +1,83 @@
+<div class="eco-container">
+  <div class="eco-dashboard-header">
+    <div>
+      <h1>Bonjour {{ firstName }} 👋</h1>
+      <p>Voici un aperçu de l'activité de votre ville aujourd'hui.</p>
+    </div>
+    <eco-button icon="refresh" variant="outlined" (click)="fetchSummary()" [loading]="loading()">
+      Actualiser
+    </eco-button>
+  </div>
+
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement du tableau de bord..." />
+  } @else {
+    <div class="eco-dashboard-kpis">
+      <eco-stats-card title="Signalements" [value]="summary().stats.totalReports" icon="description" color="primary" [trend]="'+' + summary().stats.reportsTrend + '%'" [trendUp]="true" />
+      <eco-stats-card title="En attente" [value]="summary().stats.pendingReports" icon="pending_actions" color="warning" [trend]="summary().stats.pendingTrend + '%'" [trendUp]="false" />
+      <eco-stats-card title="Résolus" [value]="summary().stats.resolvedReports" icon="check_circle" color="success" [trend]="'+' + summary().stats.resolvedTrend + '%'" [trendUp]="true" />
+      <eco-stats-card title="Agents actifs" [value]="summary().stats.activeAgents" icon="groups" color="secondary" [trend]="'+' + summary().stats.agentsTrend" [trendUp]="true" />
+    </div>
+
+    <div class="eco-dashboard-charts">
+      <eco-card title="Signalements par catégorie" subtitle="Répartition des 6 derniers mois" class="eco-dashboard-charts__main">
+        <div class="eco-chart-container">
+          <canvas baseChart [data]="barChartData" [options]="barChartOptions" type="bar"></canvas>
+        </div>
+      </eco-card>
+
+      <eco-card title="Répartition des interventions" subtitle="Par statut">
+        <div class="eco-chart-container eco-chart-container--doughnut">
+          <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions" type="doughnut"></canvas>
+        </div>
+      </eco-card>
+    </div>
+
+    <div class="eco-dashboard-bottom">
+      <eco-card title="Derniers signalements" subtitle="Les 5 signalements les plus récents" class="eco-dashboard-bottom__reports">
+        <div class="eco-table-wrapper">
+          <table class="eco-table">
+            <thead>
+              <tr>
+                <th>Signalement</th>
+                <th>Catégorie</th>
+                <th>Citoyen</th>
+                <th>Priorité</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (report of summary().recentReports; track report.id) {
+                <tr>
+                  <td>{{ report.title }}</td>
+                  <td class="eco-text-secondary">{{ report.category }}</td>
+                  <td class="eco-text-secondary">{{ report.citizen }}</td>
+                  <td><eco-status-badge [priority]="report.priority" /></td>
+                  <td><eco-status-badge [status]="report.status" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </eco-card>
+
+      <eco-card title="Activités récentes" subtitle="Actions des agents et citoyens">
+        <ul class="eco-timeline">
+          @for (activity of summary().recentActivities; track activity.id) {
+            <li class="eco-timeline__item">
+              <span class="eco-timeline__dot"><mat-icon>{{ activity.icon }}</mat-icon></span>
+              <div class="eco-timeline__content">
+                <p><strong>{{ activity.actor }}</strong> {{ activity.action }} <strong>{{ activity.target }}</strong></p>
+                <span>{{ activity.timestamp }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      </eco-card>
+    </div>
+
+    <eco-card title="Localisation des signalements" subtitle="Carte des incidents en cours" class="eco-dashboard-map">
+      <eco-incident-map [incidents]="summary().mapIncidents" />
+    </eco-card>
+  }
+</div>

@@ -1,0 +1,29 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Utilisateurs"
+    subtitle="Gestion des comptes et des rôles de la plateforme"
+    icon="groups"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Utilisateurs' }]"
+  >
+    <eco-button icon="add" (click)="openCreate()">Nouvel utilisateur</eco-button>
+  </eco-page-header>
+
+  <eco-data-table
+    [columns]="columns"
+    [data]="users()"
+    [loading]="loading()"
+    emptyTitle="Aucun utilisateur"
+    emptyDescription="Commencez par créer votre premier utilisateur."
+    (rowClick)="openEdit($event)"
+  >
+    <ng-template #actionsTemplate let-user>
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="openEdit(user)"><mat-icon>edit</mat-icon><span>Modifier</span></button>
+        <button mat-menu-item (click)="remove(user, $event)"><mat-icon color="warn">delete</mat-icon><span>Supprimer</span></button>
+      </mat-menu>
+    </ng-template>
+  </eco-data-table>
+</div>

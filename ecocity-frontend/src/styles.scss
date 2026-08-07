@@ -1,0 +1,41 @@
+@use "base/reset";
+@use "components/buttons";
+@use "components/forms";
+@use "components/cards";
+@use "components/tables";
+@use "themes/material";
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+
+html, body {
+  background: $background;
+}
+
+.eco-container {
+  padding: $space-6;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.eco-scroll-y {
+  overflow-y: auto;
+}
+
+.eco-text-secondary {
+  color: $text-secondary;
+}
+
+.eco-dialog-form {
+  display: flex;
+  flex-direction: column;
+  min-width: 420px;
+  padding-top: $space-2;
+
+  @media (max-width: 599px) { min-width: unset; }
+}
+
+.eco-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -1,0 +1,18 @@
+@use "abstracts/colors" as *;
+
+.eco-permission-matrix th, .eco-permission-matrix td {
+  text-align: left;
+}
+
+.eco-permission-matrix__module-row td {
+  background: $background;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: $text-secondary;
+}
+
+.eco-permission-matrix__checkbox {
+  text-align: center;
+}

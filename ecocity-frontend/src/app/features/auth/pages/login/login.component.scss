@@ -1,0 +1,114 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+@use "abstracts/breakpoints" as *;
+@use "abstracts/typography" as *;
+
+.eco-auth-split {
+  display: flex;
+  min-height: 100vh;
+}
+
+.eco-auth-split__brand {
+  flex: 0 0 60%;
+  background: linear-gradient(160deg, $primary-dark 0%, $primary 55%, #0F9D58 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: $space-16;
+
+  @include tablet-down { display: none; }
+}
+
+.eco-auth-split__brand-content {
+  max-width: 480px;
+  z-index: 1;
+}
+
+.eco-auth-split__logo {
+  font-size: 48px;
+  margin-bottom: $space-4;
+}
+
+.eco-auth-split__brand-content h1 {
+  font-size: $fs-3xl;
+  font-weight: 800;
+  margin-bottom: $space-3;
+}
+
+.eco-auth-split__brand-content p {
+  font-size: $fs-md;
+  opacity: 0.9;
+  line-height: $lh-relaxed;
+  margin-bottom: $space-8;
+}
+
+.eco-auth-split__features {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.eco-auth-split__blob {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  bottom: -220px;
+  right: -160px;
+}
+
+.eco-auth-split__form {
+  flex: 0 0 40%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-6;
+  background: $surface;
+
+  @include tablet-down { flex: 1 1 100%; }
+}
+
+.eco-auth-split__form-card {
+  width: 100%;
+  max-width: 380px;
+
+  h2 { font-size: $fs-2xl; font-weight: 700; }
+}
+
+.eco-auth-split__subtitle {
+  color: $text-secondary;
+  font-size: 13px;
+  margin: $space-2 0 $space-8;
+}
+
+.eco-auth-split__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-6;
+  font-size: 13px;
+
+  a { color: $primary; font-weight: 600; }
+}
+
+.eco-auth-split__footer {
+  text-align: center;
+  margin-top: $space-6;
+  font-size: 13px;
+  color: $text-secondary;
+
+  a { color: $primary; font-weight: 600; }
+}

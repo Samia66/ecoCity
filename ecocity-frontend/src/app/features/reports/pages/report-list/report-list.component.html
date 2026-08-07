@@ -1,0 +1,42 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Signalements"
+    subtitle="Suivi de tous les signalements urbains reçus"
+    icon="report_problem"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Signalements' }]"
+  >
+    <mat-form-field appearance="outline" class="eco-report-list__filter">
+      <mat-label>Catégorie</mat-label>
+      <mat-select [(ngModel)]="categoryFilter" (selectionChange)="fetch()">
+        <mat-option value="">Toutes les catégories</mat-option>
+        @for (cat of categories; track cat) {
+          <mat-option [value]="cat">{{ cat }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <eco-button icon="add" (click)="createReport()">Nouveau signalement</eco-button>
+  </eco-page-header>
+
+  <eco-data-table
+    [columns]="columns"
+    [data]="reports()"
+    [loading]="loading()"
+    emptyTitle="Aucun signalement"
+    emptyDescription="Aucun signalement ne correspond à vos critères pour le moment."
+    (rowClick)="openReport($event)"
+  >
+    <ng-template #actionsTemplate let-report>
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="openReport(report)">
+          <mat-icon>visibility</mat-icon><span>Voir le détail</span>
+        </button>
+        <button mat-menu-item (click)="deleteReport(report, $event)">
+          <mat-icon color="warn">delete</mat-icon><span>Supprimer</span>
+        </button>
+      </mat-menu>
+    </ng-template>
+  </eco-data-table>
+</div>

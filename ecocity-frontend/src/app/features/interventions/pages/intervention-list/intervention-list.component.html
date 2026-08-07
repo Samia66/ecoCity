@@ -1,0 +1,30 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Interventions"
+    subtitle="Suivi des interventions terrain et de leur avancement"
+    icon="engineering"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Interventions' }]"
+  />
+
+  <eco-data-table
+    [columns]="columns"
+    [data]="interventions()"
+    [loading]="loading()"
+    emptyTitle="Aucune intervention"
+    emptyDescription="Aucune intervention n'est en cours actuellement."
+  >
+    <ng-template #actionsTemplate let-intervention>
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <a mat-menu-item [routerLink]="['/interventions', intervention.id]">
+          <mat-icon>visibility</mat-icon><span>Voir le détail</span>
+        </a>
+        <a mat-menu-item [routerLink]="['/reports', intervention.reportId]">
+          <mat-icon>report_problem</mat-icon><span>Voir le signalement</span>
+        </a>
+      </mat-menu>
+    </ng-template>
+  </eco-data-table>
+</div>

@@ -1,0 +1,31 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Catégories"
+    subtitle="Types de signalements disponibles sur la plateforme"
+    icon="category"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Catégories' }]"
+  >
+    <eco-button icon="add" (click)="openCreate()">Nouvelle catégorie</eco-button>
+  </eco-page-header>
+
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des catégories..." />
+  } @else if (categories().length === 0) {
+    <eco-empty-state icon="category" title="Aucune catégorie" actionLabel="Créer une catégorie" (action)="openCreate()" />
+  } @else {
+    <div class="eco-category-grid">
+      @for (category of categories(); track category.id) {
+        <eco-card class="eco-category-card eco-card--hover" (click)="openEdit(category)">
+          <div class="eco-category-card__icon"><mat-icon>{{ category.icon }}</mat-icon></div>
+          <div class="eco-category-card__body">
+            <h4>{{ category.name }}</h4>
+            <span>{{ category.reportsCount }} signalements</span>
+          </div>
+          <button mat-icon-button (click)="remove(category); $event.stopPropagation()">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </eco-card>
+      }
+    </div>
+  }
+</div>

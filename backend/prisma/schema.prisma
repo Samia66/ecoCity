@@ -61,27 +61,27 @@ enum InterventionStatus {
 //////////////////////////////////////////////////////
 
 model Organization {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name        String
-  code        String   @unique
+  name String
+  code String @unique
 
-  email       String?
-  phone       String?
-  address     String?
-  city        String?
-  country     String?
+  email   String?
+  phone   String?
+  address String?
+  city    String?
+  country String?
 
-  logo        String?
-  website     String?
+  logo    String?
+  website String?
 
   description String?
 
-  isActive    Boolean  @default(true)
+  isActive Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   users User[]
 
@@ -94,7 +94,6 @@ model Organization {
   settings OrganizationSetting[]
 
   @@index([code])
-
   @@index([name])
 }
 
@@ -103,7 +102,6 @@ model Organization {
 //////////////////////////////////////////////////////
 
 model Role {
-
   id String @id @default(cuid())
 
   name RoleName @unique
@@ -124,7 +122,6 @@ model Role {
 //////////////////////////////////////////////////////
 
 model Permission {
-
   id String @id @default(cuid())
 
   code String @unique
@@ -147,7 +144,6 @@ model Permission {
 //////////////////////////////////////////////////////
 
 model RolePermission {
-
   roleId String
 
   permissionId String
@@ -159,9 +155,7 @@ model RolePermission {
   assignedAt DateTime @default(now())
 
   @@id([roleId, permissionId])
-
   @@index([roleId])
-
   @@index([permissionId])
 }
 
@@ -170,7 +164,6 @@ model RolePermission {
 //////////////////////////////////////////////////////
 
 model User {
-
   id String @id @default(cuid())
 
   organizationId String
@@ -219,6 +212,12 @@ model User {
 
   auditLogs AuditLog[] @relation("UserAuditLogs")
 
+  passwordResetTokens PasswordResetToken[]
+
+  emailVerificationTokens EmailVerificationToken[]
+
+  emailVerified Boolean @default(false)
+
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
@@ -226,13 +225,9 @@ model User {
   deletedAt DateTime?
 
   @@index([organizationId])
-
   @@index([roleId])
-
   @@index([email])
-
   @@index([status])
-
 }
 
 //////////////////////////////////////////////////////
@@ -240,39 +235,28 @@ model User {
 //////////////////////////////////////////////////////
 
 model RefreshToken {
-
   id String @id @default(cuid())
-
-  userId String
-    tokenId    String   @unique
 
   tokenHash String
 
+  userAgent  String?
+  ipAddress  String?
   deviceName String?
 
-  ipAddress String?
-
-  userAgent String?
-
   expiresAt DateTime
-
   revokedAt DateTime?
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-
-  @@index([expiresAt])
-
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 //////////////////////////////////////////////////////
 // CATEGORY
 //////////////////////////////////////////////////////
 
 model Category {
-
   id String @id @default(cuid())
 
   organizationId String
@@ -298,9 +282,7 @@ model Category {
   deletedAt DateTime?
 
   @@unique([organizationId, name])
-
   @@index([organizationId])
-
 }
 
 //////////////////////////////////////////////////////
@@ -308,7 +290,6 @@ model Category {
 //////////////////////////////////////////////////////
 
 model Report {
-
   id String @id @default(cuid())
 
   organizationId String
@@ -329,9 +310,9 @@ model Report {
 
   priority Priority @default(MEDIUM)
 
-  latitude Decimal? @db.Decimal(10,7)
+  latitude Decimal? @db.Decimal(10, 7)
 
-  longitude Decimal? @db.Decimal(10,7)
+  longitude Decimal? @db.Decimal(10, 7)
 
   address String?
 
@@ -362,17 +343,11 @@ model Report {
   deletedAt DateTime?
 
   @@index([organizationId])
-
   @@index([categoryId])
-
   @@index([authorId])
-
   @@index([assignedToId])
-
   @@index([status])
-
   @@index([priority])
-
 }
 
 //////////////////////////////////////////////////////
@@ -380,7 +355,6 @@ model Report {
 //////////////////////////////////////////////////////
 
 model ReportAttachment {
-
   id String @id @default(cuid())
 
   reportId String
@@ -404,14 +378,13 @@ model ReportAttachment {
   createdAt DateTime @default(now())
 
   @@index([reportId])
-
 }
+
 //////////////////////////////////////////////////////
 // REPORT COMMENT
 //////////////////////////////////////////////////////
 
 model ReportComment {
-
   id String @id @default(cuid())
 
   reportId String
@@ -429,9 +402,7 @@ model ReportComment {
   updatedAt DateTime @updatedAt
 
   @@index([reportId])
-
   @@index([authorId])
-
 }
 
 //////////////////////////////////////////////////////
@@ -439,7 +410,6 @@ model ReportComment {
 //////////////////////////////////////////////////////
 
 model Intervention {
-
   id String @id @default(cuid())
 
   reportId String
@@ -463,9 +433,7 @@ model Intervention {
   updatedAt DateTime @updatedAt
 
   @@index([reportId])
-
   @@index([agentId])
-
 }
 
 //////////////////////////////////////////////////////
@@ -473,7 +441,6 @@ model Intervention {
 //////////////////////////////////////////////////////
 
 model Notification {
-
   id String @id @default(cuid())
 
   organizationId String
@@ -497,9 +464,7 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@index([organizationId])
-
   @@index([userId])
-
 }
 
 //////////////////////////////////////////////////////
@@ -507,7 +472,6 @@ model Notification {
 //////////////////////////////////////////////////////
 
 model AuditLog {
-
   id String @id @default(cuid())
 
   userId String?
@@ -529,11 +493,8 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
-
   @@index([entity])
-
   @@index([createdAt])
-
 }
 
 //////////////////////////////////////////////////////
@@ -541,7 +502,6 @@ model AuditLog {
 //////////////////////////////////////////////////////
 
 model OrganizationSetting {
-
   id String @id @default(cuid())
 
   organizationId String
@@ -557,5 +517,32 @@ model OrganizationSetting {
   updatedAt DateTime @updatedAt
 
   @@unique([organizationId, key])
+}
 
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id         String    @id @default(cuid())
+  tokenHash  String
+  expiresAt  DateTime
+  verifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

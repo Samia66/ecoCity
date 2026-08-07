@@ -1,0 +1,35 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Rôles"
+    subtitle="Rôles disponibles et nombre d'utilisateurs associés"
+    icon="admin_panel_settings"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Rôles' }]"
+  >
+    <eco-button icon="tune" variant="outlined" routerLink="/roles/permissions">Matrice des permissions</eco-button>
+  </eco-page-header>
+
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des rôles..." />
+  } @else {
+    <div class="eco-role-grid">
+      @for (role of roles(); track role.id) {
+        <eco-card class="eco-role-card">
+          <div class="eco-flex-between">
+            <h4>{{ role.name }}</h4>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="remove(role)"><mat-icon color="warn">delete</mat-icon><span>Supprimer</span></button>
+            </mat-menu>
+          </div>
+          <p class="eco-role-card__description">{{ role.description }}</p>
+          <div class="eco-role-card__footer">
+            <mat-icon>groups</mat-icon>
+            <span>{{ role.usersCount }} utilisateurs</span>
+          </div>
+        </eco-card>
+      }
+    </div>
+  }
+</div>

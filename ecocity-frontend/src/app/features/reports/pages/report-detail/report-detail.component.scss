@@ -1,0 +1,64 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+@use "abstracts/breakpoints" as *;
+
+.eco-report-detail__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-5;
+  align-items: start;
+
+  @include tablet-down { grid-template-columns: 1fr; }
+}
+
+.eco-report-detail__main, .eco-report-detail__side {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.eco-report-detail__description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: $text-primary;
+}
+
+.eco-report-detail__attachments {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: $space-3;
+
+  img { width: 100%; height: 100px; object-fit: cover; border-radius: $radius-md; border: 1px solid $border; }
+}
+
+.eco-report-detail__comments {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-bottom: $space-4;
+}
+
+.eco-report-detail__comment {
+  border-bottom: 1px solid $border;
+  padding-bottom: $space-3;
+
+  strong { font-size: 13px; }
+  p { font-size: 13px; margin: 4px 0; }
+  span { font-size: 11px; color: $text-secondary; }
+}
+
+.eco-report-detail__comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.eco-report-detail__info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: $space-2 $space-4;
+  font-size: 13px;
+
+  dt { color: $text-secondary; }
+  dd { margin: 0; font-weight: 500; text-align: right; }
+}

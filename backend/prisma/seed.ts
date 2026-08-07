@@ -1,4 +1,5 @@
 import { PrismaClient, RoleName } from '@prisma/client';
+import { DEFAULT_ROLE } from 'src/modules/auth/constants/auth.roles';
 
 const prisma = new PrismaClient();
 
@@ -19,7 +20,7 @@ async function main() {
             description: 'Field agent',
         },
         {
-            name: RoleName.CITIZEN,
+            name: DEFAULT_ROLE,
             description: 'Citizen',
         },
     ];

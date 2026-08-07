@@ -1,0 +1,92 @@
+<div class="eco-container">
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement du signalement..." />
+  } @else if (report(); as r) {
+    <eco-page-header
+      [title]="r.title"
+      [subtitle]="r.address"
+      icon="report_problem"
+      [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Signalements', route: '/reports' }, { label: r.title }]"
+    >
+      <eco-status-badge [priority]="r.priority" />
+      <eco-status-badge [status]="r.status" />
+    </eco-page-header>
+
+    <div class="eco-report-detail__grid">
+      <div class="eco-report-detail__main">
+        <eco-card title="Description">
+          <p class="eco-report-detail__description">{{ r.description }}</p>
+        </eco-card>
+
+        <eco-card title="Pièces jointes" subtitle="Photos avant / après">
+          @if (r.attachments.length === 0) {
+            <p class="eco-text-secondary">Aucune pièce jointe pour ce signalement.</p>
+          } @else {
+            <div class="eco-report-detail__attachments">
+              @for (att of r.attachments; track att.id) {
+                <img [src]="att.url" [alt]="att.filename" />
+              }
+            </div>
+          }
+        </eco-card>
+
+        <eco-card title="Historique" subtitle="Évolution des statuts">
+          <ul class="eco-timeline">
+            @for (entry of r.history; track entry.id) {
+              <li class="eco-timeline__item">
+                <span class="eco-timeline__dot"><mat-icon>history</mat-icon></span>
+                <div class="eco-timeline__content">
+                  <p><eco-status-badge [status]="entry.status" /> par <strong>{{ entry.changedBy }}</strong></p>
+                  <span>{{ entry.changedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        </eco-card>
+
+        <eco-card title="Commentaires">
+          <div class="eco-report-detail__comments">
+            @for (comment of r.comments; track comment.id) {
+              <div class="eco-report-detail__comment">
+                <strong>{{ comment.author }}</strong>
+                <p>{{ comment.message }}</p>
+                <span>{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            } @empty {
+              <p class="eco-text-secondary">Aucun commentaire.</p>
+            }
+          </div>
+          <div class="eco-report-detail__comment-form">
+            <mat-form-field appearance="outline" class="eco-form-field">
+              <mat-label>Ajouter un commentaire</mat-label>
+              <textarea matInput rows="2" [(ngModel)]="newComment"></textarea>
+            </mat-form-field>
+            <eco-button (click)="addComment()">Publier</eco-button>
+          </div>
+        </eco-card>
+      </div>
+
+      <div class="eco-report-detail__side">
+        <eco-card title="Statut">
+          <mat-form-field appearance="outline" class="eco-form-field">
+            <mat-label>Changer le statut</mat-label>
+            <mat-select [value]="r.status" (selectionChange)="updateStatus($event.value)">
+              @for (opt of statusOptions; track opt[0]) {
+                <mat-option [value]="opt[0]">{{ opt[1] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </eco-card>
+
+        <eco-card title="Informations">
+          <dl class="eco-report-detail__info">
+            <dt>Catégorie</dt><dd>{{ r.category }}</dd>
+            <dt>Adresse</dt><dd>{{ r.address }}</dd>
+            <dt>Créé par</dt><dd>{{ r.createdBy }}</dd>
+            <dt>Créé le</dt><dd>{{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </dl>
+        </eco-card>
+      </div>
+    </div>
+  }
+</div>

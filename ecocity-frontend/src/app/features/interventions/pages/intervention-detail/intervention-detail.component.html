@@ -1,0 +1,53 @@
+<div class="eco-container">
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement de l'intervention..." />
+  } @else if (intervention(); as i) {
+    <eco-page-header
+      [title]="i.reportTitle"
+      subtitle="Intervention terrain"
+      icon="engineering"
+      [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Interventions', route: '/interventions' }, { label: i.reportTitle }]"
+    >
+      <eco-status-badge [status]="i.reportStatus" />
+    </eco-page-header>
+
+    <div class="eco-report-detail__grid">
+      <div class="eco-report-detail__main">
+        <eco-card title="Historique de l'intervention">
+          <ul class="eco-timeline">
+            @for (entry of i.history; track entry.id) {
+              <li class="eco-timeline__item">
+                <span class="eco-timeline__dot"><mat-icon>history</mat-icon></span>
+                <div class="eco-timeline__content">
+                  <p>Statut : <strong>{{ entry.status }}</strong> par <strong>{{ entry.changedBy }}</strong></p>
+                  <span>{{ entry.changedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        </eco-card>
+      </div>
+
+      <div class="eco-report-detail__side">
+        <eco-card title="Statut de l'intervention">
+          <mat-form-field appearance="outline" class="eco-form-field">
+            <mat-label>Changer le statut</mat-label>
+            <mat-select [value]="i.status" (selectionChange)="updateStatus($event.value)">
+              @for (opt of statusOptions; track opt[0]) {
+                <mat-option [value]="opt[0]">{{ opt[1] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </eco-card>
+
+        <eco-card title="Agent assigné">
+          <p>{{ i.assignedAgent }}</p>
+        </eco-card>
+
+        <eco-card title="Signalement lié">
+          <a [routerLink]="['/reports', i.reportId]">Voir le signalement →</a>
+        </eco-card>
+      </div>
+    </div>
+  }
+</div>

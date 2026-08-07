@@ -1,0 +1,36 @@
+<aside class="eco-sidebar" [class.eco-sidebar--collapsed]="collapsed" [class.eco-sidebar--mobile-open]="mobileOpen">
+  <div class="eco-sidebar__brand">
+    <span class="eco-sidebar__logo">🌿</span>
+    @if (!collapsed) {
+      <span class="eco-sidebar__brand-name">EcoCity</span>
+    }
+  </div>
+
+  <nav class="eco-sidebar__nav">
+    @for (item of navItems(); track item.route) {
+      <a
+        class="eco-sidebar__link"
+        [routerLink]="item.route"
+        routerLinkActive="eco-sidebar__link--active"
+        [matTooltip]="collapsed ? item.label : ''"
+        matTooltipPosition="right"
+        (click)="closeMobile.emit()"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        @if (!collapsed) {
+          <span>{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <div class="eco-sidebar__footer">
+    @if (!collapsed) {
+      <p class="eco-sidebar__footer-text">EcoCity © 2026<br />Ville durable & intelligente</p>
+    }
+  </div>
+</aside>
+
+@if (mobileOpen) {
+  <div class="eco-sidebar__backdrop" (click)="closeMobile.emit()"></div>
+}

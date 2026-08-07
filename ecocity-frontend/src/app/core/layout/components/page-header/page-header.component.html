@@ -1,0 +1,30 @@
+<div class="eco-page-header">
+  <div>
+    @if (breadcrumbs.length) {
+      <div class="eco-page-header__breadcrumbs">
+        @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
+          @if (crumb.route && !last) {
+            <a [routerLink]="crumb.route">{{ crumb.label }}</a>
+            <mat-icon>chevron_right</mat-icon>
+          } @else {
+            <span>{{ crumb.label }}</span>
+          }
+        }
+      </div>
+    }
+    <div class="eco-page-header__title-row">
+      @if (icon) {
+        <div class="eco-page-header__icon"><mat-icon>{{ icon }}</mat-icon></div>
+      }
+      <div>
+        <h1 class="eco-page-header__title">{{ title }}</h1>
+        @if (subtitle) {
+          <p class="eco-page-header__subtitle">{{ subtitle }}</p>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="eco-page-header__actions">
+    <ng-content></ng-content>
+  </div>
+</div>

@@ -11,11 +11,12 @@ import type { StringValue } from 'ms';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RolesGuard } from './guards/roles.guard';
+import { CommunicationModule } from 'src/common/communication/communication.module';
 
 @Module({
   imports: [
     PrismaModule,
-
+    CommunicationModule,
     ConfigModule,
     PassportModule,
 
@@ -33,7 +34,7 @@ import { RolesGuard } from './guards/roles.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository,JwtStrategy,RolesGuard],
+  providers: [AuthService, AuthRepository, JwtStrategy, RolesGuard],
   exports: [AuthService],
 })
 export class AuthModule { }

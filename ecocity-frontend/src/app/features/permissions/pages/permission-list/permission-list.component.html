@@ -1,0 +1,18 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Permissions"
+    subtitle="Liste de toutes les permissions disponibles sur la plateforme"
+    icon="lock_person"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Permissions' }]"
+  >
+    <eco-button icon="tune" variant="outlined" routerLink="/roles/permissions">Matrice des rôles</eco-button>
+  </eco-page-header>
+
+  <eco-data-table
+    [columns]="columns"
+    [data]="permissions()"
+    [loading]="loading()"
+    [showActionsColumn]="false"
+    emptyTitle="Aucune permission"
+  />
+</div>

@@ -1,0 +1,110 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+@use "abstracts/breakpoints" as *;
+
+.eco-sidebar {
+  width: $sidebar-width;
+  height: 100vh;
+  background: $surface;
+  border-right: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  transition: width .2s ease;
+  flex-shrink: 0;
+  z-index: 30;
+
+  &--collapsed {
+    width: $sidebar-width-collapsed;
+  }
+
+  @include tablet-down {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    transition: left .2s ease;
+
+    &--mobile-open {
+      left: 0;
+    }
+  }
+}
+
+.eco-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-5 $space-5;
+  height: $topbar-height;
+  border-bottom: 1px solid $border;
+}
+
+.eco-sidebar__logo {
+  font-size: 24px;
+  background: $primary-light;
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eco-sidebar__brand-name {
+  font-weight: 800;
+  font-size: 18px;
+  color: $primary-dark;
+}
+
+.eco-sidebar__nav {
+  flex: 1;
+  padding: $space-4 $space-3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.eco-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: 10px $space-3;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background .15s ease, color .15s ease;
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+  &:hover {
+    background: $background;
+    color: $text-primary;
+  }
+
+  &--active {
+    background: $primary-light;
+    color: $primary-dark;
+    font-weight: 600;
+  }
+}
+
+.eco-sidebar__footer {
+  padding: $space-4;
+  border-top: 1px solid $border;
+}
+
+.eco-sidebar__footer-text {
+  font-size: 11px;
+  color: $text-disabled;
+  line-height: 1.5;
+}
+
+.eco-sidebar__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: 20;
+
+  @include desktop { display: none; }
+}
