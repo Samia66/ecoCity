@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -14,6 +14,8 @@ import { TeamCardComponent } from '../components/team-card.component';
 import { TeamFormDialogComponent } from '../dialogs/team-form-dialog.component';
 import { TeamMembersDialogComponent } from '../dialogs/team-members-dialog.component';
 import { TeamZoneDialogComponent } from '../dialogs/team-zone-dialog.component';
+import { TeamLeaderDialogComponent } from '../dialogs/team-leader-dialog.component';
+import { AuthStore } from '../../../core/store/auth.store';
 
 @Component({
   selector: 'eco-team-list-page',
@@ -33,9 +35,11 @@ export class TeamListPageComponent implements OnInit {
   private teamService = inject(TeamService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private authStore = inject(AuthStore);
 
   loading = signal(true);
   teams = signal<Team[]>([]);
+  canManage = computed(() => this.authStore.hasPermission('teams.manage'));
 
   ngOnInit(): void {
     this.fetch();
@@ -97,7 +101,19 @@ export class TeamListPageComponent implements OnInit {
       .afterClosed()
       .subscribe((changed) => {
         if (changed) {
-          this.snackBar.open('Zone affectée avec succès.', 'Fermer', { duration: 3000 });
+          this.snackBar.open('Zones mises à jour avec succès.', 'Fermer', { duration: 3000 });
+          this.fetch();
+        }
+      });
+  }
+
+  openLeader(team: Team): void {
+    this.dialog
+      .open(TeamLeaderDialogComponent, { data: { team } })
+      .afterClosed()
+      .subscribe((changed) => {
+        if (changed) {
+          this.snackBar.open("Chef d'équipe mis à jour.", 'Fermer', { duration: 3000 });
           this.fetch();
         }
       });

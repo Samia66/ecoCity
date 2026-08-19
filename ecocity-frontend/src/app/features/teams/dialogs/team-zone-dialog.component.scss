@@ -3,24 +3,59 @@
 
 :host {
   display: block;
-  min-width: 380px;
+  min-width: 420px;
 
   @media (max-width: 599px) { min-width: unset; }
 }
 
-.eco-team-zone__current {
+.eco-team-members__hint {
   font-size: 13px;
-  color: $text-primary;
-  margin-bottom: $space-4;
-
-  &--empty {
-    color: $text-secondary;
-    font-style: italic;
-  }
+  color: $text-secondary;
+  margin-bottom: $space-3;
 }
 
-.eco-team-zone__empty {
+.eco-team-members__empty {
   font-size: 13px;
   color: $text-secondary;
   font-style: italic;
+  padding: $space-4 0;
+}
+
+.eco-team-members__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: $space-2;
+}
+
+.eco-team-members__item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-2 $space-3;
+  border-radius: $radius-md;
+  cursor: pointer;
+
+  &:hover { background: $background; }
+}
+
+.eco-team-members__item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.eco-team-members__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.eco-team-members__item-email {
+  font-size: 11px;
+  color: $text-secondary;
 }

@@ -5,7 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { ENDPOINTS } from '../../../core/api/endpoints';
 import { ApiResponse } from '../../../core/api/api-response.model';
 import { unwrap } from '../../../core/api/unwrap-response.operator';
-import { CreateTeamPayload, Team, TeamMember } from '../models/team.model';
+import { CreateTeamPayload, Team, TeamMember, UpdateTeamPayload } from '../models/team.model';
 
 @Injectable({ providedIn: 'root' })
 export class TeamService {
@@ -24,7 +24,7 @@ export class TeamService {
     return this.http.post<ApiResponse<Team>>(this.baseUrl, payload).pipe(unwrap());
   }
 
-  update(id: string, payload: Partial<CreateTeamPayload>): Observable<Team> {
+  update(id: string, payload: UpdateTeamPayload): Observable<Team> {
     return this.http.patch<ApiResponse<Team>>(`${this.baseUrl}/${id}`, payload).pipe(unwrap());
   }
 
@@ -48,13 +48,19 @@ export class TeamService {
     return this.http.delete<void>(`${this.baseUrl}/${teamId}/members/${agentId}`);
   }
 
-  // --- Affectation de zone ---------------------------------------------
+  // --- Chef d'équipe -----------------------------------------------------
 
-  assignZone(teamId: string, zoneId: string): Observable<Team> {
-    return this.http.post<ApiResponse<Team>>(`${this.baseUrl}/${teamId}/zone`, { zoneId }).pipe(unwrap());
+  assignLeader(teamId: string, agentId: string): Observable<Team> {
+    return this.http.patch<ApiResponse<Team>>(`${this.baseUrl}/${teamId}/leader`, { agentId }).pipe(unwrap());
   }
 
-  unassignZone(teamId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${teamId}/zone`);
+  // --- Zones (plusieurs zones par équipe) -------------------------------
+
+  addZone(teamId: string, zoneId: string): Observable<Team> {
+    return this.http.post<ApiResponse<Team>>(`${this.baseUrl}/${teamId}/zones`, { zoneId }).pipe(unwrap());
+  }
+
+  removeZone(teamId: string, zoneId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${teamId}/zones/${zoneId}`);
   }
 }

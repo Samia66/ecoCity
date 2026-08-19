@@ -118,6 +118,7 @@ Color statusColor(String status) {
   switch (status) {
     case 'NOUVEAU':
     case 'EN_ATTENTE':
+    case 'PLANIFIEE':
       return AppColors.pending;
     case 'VALIDE':
     case 'ASSIGNE':
@@ -131,6 +132,7 @@ Color statusColor(String status) {
     case 'REJETE':
     case 'REJETEE':
     case 'ANNULEE':
+    case 'NON_EFFECTUEE':
       return AppColors.rejected;
     default:
       return AppColors.pending;

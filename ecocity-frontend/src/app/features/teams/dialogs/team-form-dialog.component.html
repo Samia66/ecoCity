@@ -1,21 +1,79 @@
 <h2 mat-dialog-title>{{ isEdit ? "Modifier l'équipe" : 'Nouvelle équipe' }}</h2>
 <mat-dialog-content>
-  <form [formGroup]="form" class="eco-dialog-form">
-    <mat-form-field appearance="outline" class="eco-form-field">
-      <mat-label>Nom de l'équipe</mat-label>
-      <input matInput formControlName="name" placeholder="Ex : Équipe Nord" />
-      @if (f.name.touched && f.name.invalid) {
-        <mat-error>Le nom est requis</mat-error>
-      }
-    </mat-form-field>
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="eco-form-backend-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
 
-    <mat-form-field appearance="outline" class="eco-form-field">
-      <mat-label>Description</mat-label>
-      <textarea matInput rows="3" formControlName="description" placeholder="Optionnel"></textarea>
-    </mat-form-field>
-  </form>
+    <form [formGroup]="form" class="eco-dialog-form">
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Nom de l'équipe</mat-label>
+        <input matInput formControlName="name" placeholder="Ex : Équipe Zongo" />
+        @if (f.name.touched && f.name.invalid) {
+          <mat-error>Le nom est requis</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="3" formControlName="description" placeholder="Optionnel"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Statut</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="ACTIVE">Active</mat-option>
+          <mat-option value="INACTIVE">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      @if (!isEdit) {
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Chef d'équipe</mat-label>
+          <mat-select formControlName="leaderId">
+            @for (leader of leaders(); track leader.id) {
+              <mat-option [value]="leader.id">{{ leader.firstName }} {{ leader.lastName }}</mat-option>
+            }
+          </mat-select>
+          @if (f.leaderId.touched && f.leaderId.invalid) {
+            <mat-error>Le chef d'équipe est requis</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Agents ({{ maxAgents }} max)</mat-label>
+          <mat-select formControlName="agentIds" multiple>
+            @for (agent of agents(); track agent.id) {
+              <mat-option [value]="agent.id" [disabled]="f.agentIds.value.length >= maxAgents && !f.agentIds.value.includes(agent.id)">
+                {{ agent.firstName }} {{ agent.lastName }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (f.agentIds.touched && f.agentIds.invalid) {
+            <mat-error>Au moins un agent est requis</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Zones (optionnel)</mat-label>
+          <mat-select formControlName="zoneIds" multiple>
+            @for (zone of zones(); track zone.id) {
+              <mat-option [value]="zone.id">{{ zone.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+    </form>
+  }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-stroked-button mat-dialog-close>Annuler</button>
-  <eco-button [loading]="submitting()" (click)="submit()">{{ isEdit ? 'Enregistrer' : 'Créer' }}</eco-button>
+  <eco-button [loading]="submitting()" [disabled]="loading()" (click)="submit()">
+    {{ isEdit ? 'Enregistrer' : 'Créer' }}
+  </eco-button>
 </mat-dialog-actions>

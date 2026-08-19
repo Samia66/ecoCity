@@ -5,11 +5,10 @@ export interface ZoneDto {
   id: string;
   name: string;
   description?: string | null;
-  agentsCount: number;
-  /** Nombre d'équipes de terrain actuellement affectées à cette zone. */
+  /** Équipes actuellement responsables de la collecte dans cette zone. */
+  teams: { id: string; name: string }[];
   teamsCount: number;
   reportsCount: number;
-  agents: { agentId: string; agentName: string }[];
   createdAt: string;
 }
 
@@ -20,10 +19,9 @@ export class ZonesMapper {
       id: zone.id,
       name: zone.name,
       description: zone.description,
-      agentsCount: zone._count.assignments,
-      teamsCount: zone._count.teams,
+      teams: zone.teamZones.map((tz) => ({ id: tz.team.id, name: tz.team.name })),
+      teamsCount: zone._count.teamZones,
       reportsCount: zone._count.reports,
-      agents: zone.assignments.map((a) => ({ agentId: a.agentId, agentName: a.agentName })),
       createdAt: zone.createdAt.toISOString(),
     };
   }

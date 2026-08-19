@@ -17,9 +17,11 @@ import { Team } from '../models/team.model';
 })
 export class TeamCardComponent {
   @Input({ required: true }) team!: Team;
+  @Input() canManage = false;
 
   @Output() manageMembers = new EventEmitter<Team>();
   @Output() assignZone = new EventEmitter<Team>();
+  @Output() assignLeader = new EventEmitter<Team>();
   @Output() edit = new EventEmitter<Team>();
   @Output() remove = new EventEmitter<Team>();
 }

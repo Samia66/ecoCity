@@ -22,6 +22,8 @@ import { RolesModule } from './modules/roles/roles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { ZonesModule } from './modules/zones/zones.module';
 import { TeamsModule } from './modules/teams/teams.module';
+import { CollectionSchedulesModule } from './modules/collection-schedules/collection-schedules.module';
+import { CollectionsModule } from './modules/collections/collections.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { InterventionsModule } from './modules/interventions/interventions.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
@@ -45,6 +47,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     PermissionsModule,
     ZonesModule,
     TeamsModule,
+    CollectionSchedulesModule,
+    CollectionsModule,
     ReportsModule,
     InterventionsModule,
     DashboardModule,

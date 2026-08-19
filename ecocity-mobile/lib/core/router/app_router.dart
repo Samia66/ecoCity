@@ -28,6 +28,9 @@ import '../../features/team_leader/presentation/screens/team_screen.dart';
 import '../../features/team_leader/presentation/screens/interventions_to_assign_screen.dart';
 import '../../features/team_leader/presentation/screens/team_leader_profile_screen.dart';
 
+import '../../features/shared/presentation/screens/collection_list_screen.dart';
+import '../../features/shared/presentation/screens/collection_detail_screen.dart';
+
 /// Routes de l'application EcoCity.
 ///
 /// L'utilisateur ne choisit jamais manuellement son interface.
@@ -55,6 +58,8 @@ abstract class AppRoutes {
   static const agentInterventions = '/agent/interventions';
   static const agentInterventionDetail =
       '/agent/interventions/:id';
+  static const agentCollections = '/agent/collections';
+  static const agentCollectionDetail = '/agent/collections/:id';
   static const agentMap = '/agent/map';
   static const agentProfile = '/agent/profile';
 
@@ -70,6 +75,12 @@ abstract class AppRoutes {
 
   static const teamLeaderAssign =
       '/team-leader/interventions-to-assign';
+
+  static const teamLeaderCollections =
+      '/team-leader/collections';
+
+  static const teamLeaderCollectionDetail =
+      '/team-leader/collections/:id';
 
   static const teamLeaderProfile =
       '/team-leader/profile';
@@ -259,6 +270,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
 
           GoRoute(
+            path: AppRoutes.agentCollections,
+            builder: (_, __) =>
+                const CollectionListScreen(detailRouteBase: '/agent/collections'),
+          ),
+
+          GoRoute(
+            path: AppRoutes.agentCollectionDetail,
+            builder: (_, state) {
+              final collectionId = state.pathParameters['id'];
+
+              if (collectionId == null || collectionId.isEmpty) {
+                return const Scaffold(
+                  body: Center(child: Text('Collecte introuvable')),
+                );
+              }
+
+              return CollectionDetailScreen(collectionId: collectionId);
+            },
+          ),
+
+          GoRoute(
             path: AppRoutes.agentMap,
             builder: (_, __) =>
                 const AgentMapScreen(),
@@ -299,6 +331,27 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.teamLeaderAssign,
             builder: (_, __) =>
                 const InterventionsToAssignScreen(),
+          ),
+
+          GoRoute(
+            path: AppRoutes.teamLeaderCollections,
+            builder: (_, __) =>
+                const CollectionListScreen(detailRouteBase: '/team-leader/collections'),
+          ),
+
+          GoRoute(
+            path: AppRoutes.teamLeaderCollectionDetail,
+            builder: (_, state) {
+              final collectionId = state.pathParameters['id'];
+
+              if (collectionId == null || collectionId.isEmpty) {
+                return const Scaffold(
+                  body: Center(child: Text('Collecte introuvable')),
+                );
+              }
+
+              return CollectionDetailScreen(collectionId: collectionId);
+            },
           ),
 
           GoRoute(

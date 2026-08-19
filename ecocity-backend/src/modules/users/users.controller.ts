@@ -18,8 +18,6 @@ import { UsersService } from './users.service';
 import { CreateStaffUserDto } from './dto/create-staff-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
-import { AssignTeamLeaderDto } from './dto/assign-team-leader.dto';
-import { AssignZonesDto } from './dto/assign-zones.dto';
 
 @Controller('users')
 @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN, RoleName.TEAM_LEADER)
@@ -50,20 +48,5 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.usersService.remove(id, user);
-  }
-
-  @Patch(':id/team-leader')
-  @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN)
-  assignTeamLeader(
-    @Param('id') id: string,
-    @Body() dto: AssignTeamLeaderDto,
-    @CurrentUser() user: AuthenticatedUser,
-  ) {
-    return this.usersService.assignTeamLeader(id, dto, user);
-  }
-
-  @Patch(':id/zones')
-  assignZones(@Param('id') id: string, @Body() dto: AssignZonesDto, @CurrentUser() user: AuthenticatedUser) {
-    return this.usersService.assignZones(id, dto, user);
   }
 }

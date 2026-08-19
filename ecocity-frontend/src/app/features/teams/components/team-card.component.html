@@ -2,6 +2,9 @@
   <div class="eco-team-card__header">
     <div class="eco-team-card__title-block">
       <h4 class="eco-team-card__title">{{ team.name }}</h4>
+      <span class="eco-team-card__status" [class.eco-team-card__status--inactive]="team.status === 'INACTIVE'">
+        {{ team.status === 'ACTIVE' ? 'Active' : 'Inactive' }}
+      </span>
       @if (team.description) {
         <p class="eco-team-card__description">{{ team.description }}</p>
       } @else {
@@ -9,46 +12,78 @@
       }
     </div>
 
-    <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="manageMembers.emit(team)">
-        <mat-icon>group</mat-icon><span>Gérer les membres</span>
+    @if (canManage) {
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
       </button>
-      <button mat-menu-item (click)="assignZone.emit(team)">
-        <mat-icon>map</mat-icon><span>Affecter une zone</span>
-      </button>
-      <button mat-menu-item (click)="edit.emit(team)">
-        <mat-icon>edit</mat-icon><span>Modifier</span>
-      </button>
-      <button mat-menu-item (click)="remove.emit(team)">
-        <mat-icon color="warn">delete</mat-icon><span>Supprimer</span>
-      </button>
-    </mat-menu>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="assignLeader.emit(team)">
+          <mat-icon>military_tech</mat-icon><span>Chef d'équipe</span>
+        </button>
+        <button mat-menu-item (click)="manageMembers.emit(team)">
+          <mat-icon>group</mat-icon><span>Gérer les agents</span>
+        </button>
+        <button mat-menu-item (click)="assignZone.emit(team)">
+          <mat-icon>map</mat-icon><span>Zones</span>
+        </button>
+        <button mat-menu-item (click)="edit.emit(team)">
+          <mat-icon>edit</mat-icon><span>Modifier</span>
+        </button>
+        <button mat-menu-item (click)="remove.emit(team)">
+          <mat-icon color="warn">delete</mat-icon><span>Supprimer</span>
+        </button>
+      </mat-menu>
+    }
+  </div>
+
+  <div class="eco-team-card__leader">
+    <mat-icon>military_tech</mat-icon>
+    @if (team.leaderName) {
+      <span>{{ team.leaderName }}</span>
+    } @else {
+      <span class="eco-team-card__leader--empty">Aucun chef affecté</span>
+    }
   </div>
 
   <div class="eco-team-card__zone">
     <mat-icon>map</mat-icon>
-    @if (team.zoneName) {
-      <span>{{ team.zoneName }}</span>
+    @if (team.zones.length > 0) {
+      <div class="eco-team-card__chips">
+        @for (zone of team.zones; track zone.id) {
+          <mat-chip>{{ zone.name }}</mat-chip>
+        }
+      </div>
     } @else {
       <span class="eco-team-card__zone--empty">Aucune zone affectée</span>
     }
   </div>
 
+  @if (team.scheduleDays.length > 0) {
+    <div class="eco-team-card__zone">
+      <mat-icon>event</mat-icon>
+      <div class="eco-team-card__chips">
+        @for (day of team.scheduleDays; track day) {
+          <mat-chip>{{ day | titlecase }}</mat-chip>
+        }
+      </div>
+    </div>
+  }
+
   <div class="eco-team-card__members">
     <div class="eco-team-card__members-label">
       <mat-icon>groups</mat-icon>
-      <span>{{ team.members.length }} / 3 agents</span>
+      <span>{{ team.members.length }} / 3 membres</span>
     </div>
 
     @if (team.members.length === 0) {
-      <p class="eco-team-card__no-members">Aucun agent assigné</p>
+      <p class="eco-team-card__no-members">Aucun membre</p>
     } @else {
       <div class="eco-team-card__chips">
         @for (member of team.members; track member.id) {
-          <mat-chip [matTooltip]="member.email">{{ member.firstName }} {{ member.lastName }}</mat-chip>
+          <mat-chip [matTooltip]="member.email">
+            {{ member.firstName }} {{ member.lastName }}
+            @if (member.role === 'LEADER') { (Chef) }
+          </mat-chip>
         }
       </div>
     }
@@ -59,14 +94,16 @@
     <span>Créée le {{ team.createdAt | date: 'dd/MM/yyyy' }}</span>
   </div>
 
-  <div class="eco-team-card__actions">
-    <button mat-stroked-button (click)="manageMembers.emit(team)">
-      <mat-icon>group</mat-icon>
-      Membres
-    </button>
-    <button mat-stroked-button (click)="assignZone.emit(team)">
-      <mat-icon>map</mat-icon>
-      Zone
-    </button>
-  </div>
+  @if (canManage) {
+    <div class="eco-team-card__actions">
+      <button mat-stroked-button (click)="manageMembers.emit(team)">
+        <mat-icon>group</mat-icon>
+        Agents
+      </button>
+      <button mat-stroked-button (click)="assignZone.emit(team)">
+        <mat-icon>map</mat-icon>
+        Zones
+      </button>
+    </div>
+  }
 </div>

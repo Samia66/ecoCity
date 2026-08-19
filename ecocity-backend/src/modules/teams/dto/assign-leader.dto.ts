@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class AssignTeamLeaderDto {
+export class AssignLeaderDto {
   @IsString()
   @IsNotEmpty()
-  teamLeaderId!: string;
+  agentId!: string;
 }

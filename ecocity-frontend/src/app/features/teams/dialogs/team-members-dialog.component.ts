@@ -33,8 +33,10 @@ export class TeamMembersDialogComponent implements OnInit {
   private userService = inject(UserService);
   private dialogRef = inject(MatDialogRef<TeamMembersDialogComponent>);
 
-  readonly minMembers = TEAM_MIN_MEMBERS;
-  readonly maxMembers = TEAM_MAX_MEMBERS;
+  // Le chef d'équipe occupe une place à part (géré via son propre dialog) —
+  // cette liste ne gère que les agents (1 à 2, sur les 2 à 3 membres au total).
+  readonly minMembers = TEAM_MIN_MEMBERS - 1;
+  readonly maxMembers = TEAM_MAX_MEMBERS - 1;
 
   loading = signal(true);
   saving = signal(false);
@@ -56,7 +58,7 @@ export class TeamMembersDialogComponent implements OnInit {
     }).subscribe({
       next: ({ agents, members }) => {
         this.agents.set(agents.data);
-        const ids = new Set(members.map((m) => m.id));
+        const ids = new Set(members.filter((m) => m.role === 'AGENT').map((m) => m.id));
         this.initialMemberIds = new Set(ids);
         this.selectedAgentIds.set(new Set(ids));
         this.loading.set(false);

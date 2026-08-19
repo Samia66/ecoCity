@@ -3,8 +3,8 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 const WITH_RELATIONS = {
-  assignments: true,
-  _count: { select: { reports: true, assignments: true, teams: true } },
+  teamZones: { include: { team: true } },
+  _count: { select: { reports: true, teamZones: true } },
 } satisfies Prisma.ZoneInclude;
 
 export type ZoneWithRelations = Prisma.ZoneGetPayload<{ include: typeof WITH_RELATIONS }>;

@@ -29,8 +29,15 @@ export enum PermissionCode {
   ROLES_MANAGE = 'roles.manage',
 
   // Équipes & zones de terrain
+  TEAMS_VIEW = 'teams.view',
   TEAMS_MANAGE = 'teams.manage',
+  ZONES_VIEW = 'zones.view',
   ZONES_MANAGE = 'zones.manage',
+  COLLECTION_SCHEDULES_MANAGE = 'collection-schedules.manage',
+
+  // Collectes (missions de terrain planifiées)
+  COLLECTIONS_VIEW = 'collections.view',
+  COLLECTIONS_MANAGE = 'collections.manage',
 
   // Paramètres
   SETTINGS_MANAGE = 'settings.manage',
@@ -54,8 +61,17 @@ export const PERMISSION_CATALOG: Array<{ code: PermissionCode; label: string; mo
   { code: PermissionCode.ORGANIZATIONS_MANAGE, label: 'Gérer les organisations', module: 'Organisations' },
   { code: PermissionCode.CATEGORIES_MANAGE, label: 'Gérer les catégories', module: 'Catégories' },
   { code: PermissionCode.ROLES_MANAGE, label: 'Gérer les rôles et permissions', module: 'Rôles' },
+  { code: PermissionCode.TEAMS_VIEW, label: 'Voir les équipes de terrain', module: 'Équipes' },
   { code: PermissionCode.TEAMS_MANAGE, label: "Gérer les équipes de terrain", module: 'Équipes' },
+  { code: PermissionCode.ZONES_VIEW, label: "Voir les zones d'intervention", module: 'Zones' },
   { code: PermissionCode.ZONES_MANAGE, label: "Gérer les zones d'intervention", module: 'Zones' },
+  {
+    code: PermissionCode.COLLECTION_SCHEDULES_MANAGE,
+    label: 'Gérer les plannings de collecte',
+    module: 'Zones',
+  },
+  { code: PermissionCode.COLLECTIONS_VIEW, label: 'Voir les collectes', module: 'Collectes' },
+  { code: PermissionCode.COLLECTIONS_MANAGE, label: 'Gérer les collectes (démarrer/terminer/signaler)', module: 'Collectes' },
   { code: PermissionCode.SETTINGS_MANAGE, label: 'Gérer les paramètres', module: 'Paramètres' },
   { code: PermissionCode.DASHBOARD_VIEW_GLOBAL, label: 'Voir le tableau de bord global', module: 'Tableau de bord' },
   {

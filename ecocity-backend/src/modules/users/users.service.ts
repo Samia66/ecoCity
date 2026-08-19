@@ -13,14 +13,11 @@ import { generateTempPassword } from '../../common/utils/password-generator.util
 import { paginate, toSkipTake, PaginatedResult } from '../../common/utils/pagination.util';
 import { RoleName } from '../../common/constants/roles.constant';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
-import { InterventionsRepository } from '../interventions/interventions.repository';
 import { UsersRepository } from './users.repository';
 import { UsersMapper, UserItemDto } from './users.mapper';
 import { CreateStaffUserDto } from './dto/create-staff-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
-import { AssignTeamLeaderDto } from './dto/assign-team-leader.dto';
-import { AssignZonesDto } from './dto/assign-zones.dto';
 
 /** Qui peut créer quel rôle "staff" — hiérarchie stricte. */
 const CREATION_HIERARCHY: Record<string, RoleName[]> = {
@@ -41,7 +38,6 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly usersMapper: UsersMapper,
-    private readonly interventionsRepository: InterventionsRepository,
     private readonly configService: ConfigService,
   ) {
     this.appConfig = this.configService.get<AppConfig>('app')!;
@@ -156,115 +152,7 @@ export class UsersService {
     }
 
     await this.usersRepository.softDelete(id);
-    await this.usersRepository.removeTeamMembership(id);
-  }
-
-  async assignTeamLeader(agentId: string, dto: AssignTeamLeaderDto, requester: AuthenticatedUser): Promise<void> {
-    const [agent, teamLeader] = await Promise.all([
-      this.usersRepository.findById(agentId),
-      this.usersRepository.findById(dto.teamLeaderId),
-    ]);
-
-    if (!agent || agent.role.name !== RoleName.AGENT) {
-      throw new NotFoundException('Agent introuvable.');
-    }
-    if (!teamLeader || teamLeader.role.name !== RoleName.TEAM_LEADER) {
-      throw new BadRequestException("La cible n'est pas un chef d'équipe valide.");
-    }
-    this.assertSameOrganization(agent.organizationId, requester);
-    if (agent.organizationId !== teamLeader.organizationId) {
-      throw new BadRequestException("L'agent et le chef d'équipe doivent appartenir à la même organisation.");
-    }
-
-    await this.usersRepository.upsertTeamMembership({
-      agentId: agent.id,
-      agentName: `${agent.firstName} ${agent.lastName}`,
-      teamLeaderId: teamLeader.id,
-      teamLeaderName: `${teamLeader.firstName} ${teamLeader.lastName}`,
-      organizationId: agent.organizationId,
-    });
-  }
-
-  async assignZones(agentId: string, dto: AssignZonesDto, requester: AuthenticatedUser): Promise<void> {
-    const agent = await this.usersRepository.findById(agentId);
-    if (!agent || agent.role.name !== RoleName.AGENT) {
-      throw new NotFoundException('Agent introuvable.');
-    }
-    this.assertSameOrganization(agent.organizationId, requester);
-
-    await this.usersRepository.replaceZoneAssignments(
-      agent.id,
-      `${agent.firstName} ${agent.lastName}`,
-      dto.zoneIds,
-    );
-  }
-
-  // --- Vue "mon équipe" (TEAM_LEADER) -------------------------------------
-
-  async getMyTeamAgents(teamLeaderId: string): Promise<UserItemDto[]> {
-    const memberships = await this.usersRepository.findTeamMembersOf(teamLeaderId);
-    const agents = await Promise.all(memberships.map((m) => this.usersRepository.findById(m.agentId)));
-    return agents.filter((a): a is NonNullable<typeof a> => !!a && !a.deletedAt).map((a) => this.usersMapper.toItem(a));
-  }
-
-  /**
-   * Vue enrichie pour l'écran "Mon équipe" de l'app Flutter : ajoute la
-   * charge de travail (interventions actives/en cours) et le temps moyen de
-   * résolution de chaque agent. `isOnline` et `latitude`/`longitude` ne sont
-   * pas suivis par ce backend (pas de géolocalisation temps réel en base) —
-   * renvoyés en valeurs par défaut, à câbler plus tard si besoin.
-   */
-  async getMyTeamAgentsWithStats(teamLeaderId: string): Promise<
-    Array<UserItemDto & { assignedCount: number; inProgressCount: number; averageResolutionMinutes: number; isOnline: boolean }>
-  > {
-    const memberships = await this.usersRepository.findTeamMembersOf(teamLeaderId);
-    const agents = await Promise.all(memberships.map((m) => this.usersRepository.findById(m.agentId)));
-    const validAgents = agents.filter((a): a is NonNullable<typeof a> => !!a && !a.deletedAt);
-
-    return Promise.all(
-      validAgents.map(async (agent) => {
-        const [active, inProgress, avgMinutes] = await Promise.all([
-          this.interventionsRepository.countByStatus({
-            agentId: agent.id,
-            status: { in: ['ASSIGNEE', 'ACCEPTEE', 'EN_COURS'] },
-          }),
-          this.interventionsRepository.countByStatus({ agentId: agent.id, status: 'EN_COURS' }),
-          this.interventionsRepository.averageResolutionMinutes(agent.id),
-        ]);
-        const sum = (rows: { _count: { _all: number } }[]) => rows.reduce((s, r) => s + r._count._all, 0);
-        const recentlyActive = !!agent.lastLoginAt && Date.now() - agent.lastLoginAt.getTime() < 15 * 60_000;
-
-        return {
-          ...this.usersMapper.toItem(agent),
-          assignedCount: sum(active),
-          inProgressCount: sum(inProgress),
-          averageResolutionMinutes: avgMinutes,
-          isOnline: recentlyActive,
-        };
-      }),
-    );
-  }
-
-  async getMyTeamAgentDetail(teamLeaderId: string, agentId: string): Promise<UserItemDto> {
-    const membership = await this.usersRepository.findTeamMembership(agentId);
-    if (!membership || membership.teamLeaderId !== teamLeaderId) {
-      throw new NotFoundException("Cet agent ne fait pas partie de votre équipe.");
-    }
-    const agent = await this.usersRepository.findById(agentId);
-    if (!agent || agent.deletedAt) {
-      throw new NotFoundException('Agent introuvable.');
-    }
-    return this.usersMapper.toItem(agent);
-  }
-
-  async getMyTeamStats(teamLeaderId: string): Promise<{ totalAgents: number; activeAgents: number }> {
-    const memberships = await this.usersRepository.findTeamMembersOf(teamLeaderId);
-    const agents = await Promise.all(memberships.map((m) => this.usersRepository.findById(m.agentId)));
-    const validAgents = agents.filter((a): a is NonNullable<typeof a> => !!a && !a.deletedAt);
-    return {
-      totalAgents: validAgents.length,
-      activeAgents: validAgents.filter((a) => a.status === 'ACTIVE').length,
-    };
+    await this.usersRepository.removeFromAllTeams(id);
   }
 
   // --------------------------------------------------------------------

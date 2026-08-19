@@ -27,10 +27,18 @@ const ROLE_PERMISSIONS: Record<RoleName, PermissionCode[]> = {
     PermissionCode.SETTINGS_MANAGE,
     PermissionCode.DASHBOARD_VIEW_ORGANIZATION,
     PermissionCode.ORGANIZATIONS_VIEW,
+    PermissionCode.TEAMS_VIEW,
     PermissionCode.TEAMS_MANAGE,
+    PermissionCode.ZONES_VIEW,
     PermissionCode.ZONES_MANAGE,
+    PermissionCode.COLLECTION_SCHEDULES_MANAGE,
+    PermissionCode.COLLECTIONS_VIEW,
+    PermissionCode.COLLECTIONS_MANAGE,
   ],
 
+  // Le CHEF_EQUIPE consulte sa propre équipe/zones/planning et pilote les
+  // collectes de son équipe, mais ne crée/modifie plus les équipes ou zones
+  // elles-mêmes (réservé à l'ADMIN).
   [RoleName.TEAM_LEADER]: [
     PermissionCode.REPORTS_VIEW,
     PermissionCode.INTERVENTIONS_VIEW,
@@ -38,14 +46,20 @@ const ROLE_PERMISSIONS: Record<RoleName, PermissionCode[]> = {
     PermissionCode.INTERVENTIONS_UPDATE,
     PermissionCode.USERS_VIEW,
     PermissionCode.DASHBOARD_VIEW_ORGANIZATION,
-    PermissionCode.TEAMS_MANAGE,
-    PermissionCode.ZONES_MANAGE,
+    PermissionCode.TEAMS_VIEW,
+    PermissionCode.ZONES_VIEW,
+    PermissionCode.COLLECTIONS_VIEW,
+    PermissionCode.COLLECTIONS_MANAGE,
   ],
 
   [RoleName.AGENT]: [
     PermissionCode.REPORTS_VIEW,
     PermissionCode.INTERVENTIONS_VIEW,
     PermissionCode.INTERVENTIONS_UPDATE,
+    PermissionCode.TEAMS_VIEW,
+    PermissionCode.ZONES_VIEW,
+    PermissionCode.COLLECTIONS_VIEW,
+    PermissionCode.COLLECTIONS_MANAGE,
   ],
 
   [RoleName.CITIZEN]: [
@@ -160,7 +174,7 @@ async function main(): Promise<void> {
   );
 
   // -------------------------------------------------------------------
-  // Zone par défaut
+  // Zones
   // -------------------------------------------------------------------
   await prisma.zone.upsert({
     where: { id: 'seed-zone-centre' },
@@ -175,7 +189,29 @@ async function main(): Promise<void> {
     },
   });
 
-  console.log('✔ Zone par défaut créée');
+  const zoneZongoNord = await prisma.zone.upsert({
+    where: { id: 'seed-zone-zongo-nord' },
+    update: {},
+    create: {
+      id: 'seed-zone-zongo-nord',
+      name: 'Zongo Nord',
+      description: 'Zone résidentielle située au nord du quartier Zongo, Cotonou.',
+      organizationId: organization.id,
+    },
+  });
+
+  const zoneZongoSud = await prisma.zone.upsert({
+    where: { id: 'seed-zone-zongo-sud' },
+    update: {},
+    create: {
+      id: 'seed-zone-zongo-sud',
+      name: 'Zongo Sud',
+      description: 'Zone résidentielle située au sud du quartier Zongo, Cotonou.',
+      organizationId: organization.id,
+    },
+  });
+
+  console.log('✔ Zones créées (Centre-ville, Zongo Nord, Zongo Sud)');
 
   // -------------------------------------------------------------------
   // Comptes de démonstration
@@ -224,6 +260,15 @@ async function main(): Promise<void> {
     },
 
     {
+      email: 'agent2@cotonou.bj',
+      password: 'Demo2026!',
+      firstName: 'Michel',
+      lastName: 'Adjovi',
+      role: RoleName.AGENT,
+      mustChangePassword: false,
+    },
+
+    {
       email: 'citoyen@example.com',
       password: 'Demo2026!',
       firstName: 'Aïcha',
@@ -267,34 +312,66 @@ await prisma.user.upsert({
   );
 
   // -------------------------------------------------------------------
-  // Rattachement AGENT -> TEAM_LEADER
+  // Équipe Zongo : chef Marcel, agents Roland + Michel, zones Zongo
+  // Nord/Sud, planning de collecte (cf. cahier des charges §18)
   // -------------------------------------------------------------------
-  const agent = await prisma.user.findUnique({
-    where: { email: 'agent@cotonou.bj' },
-  });
+  const teamLeader = await prisma.user.findUnique({ where: { email: 'chef.equipe@cotonou.bj' } });
+  const agentRoland = await prisma.user.findUnique({ where: { email: 'agent@cotonou.bj' } });
+  const agentMichel = await prisma.user.findUnique({ where: { email: 'agent2@cotonou.bj' } });
 
-  const teamLeader = await prisma.user.findUnique({
-    where: { email: 'chef.equipe@cotonou.bj' },
-  });
+  if (teamLeader && agentRoland && agentMichel) {
+    const existingTeam = await prisma.team.findFirst({ where: { id: 'seed-team-zongo' } });
 
-  if (agent && teamLeader) {
-    await prisma.teamMembership.upsert({
-      where: { agentId: agent.id },
+    if (!existingTeam) {
+      await prisma.team.create({
+        data: {
+          id: 'seed-team-zongo',
+          name: 'Équipe Zongo',
+          description: 'Équipe responsable de la collecte des déchets dans le quartier Zongo.',
+          status: 'ACTIVE',
+          organizationId: organization.id,
+          createdById: teamLeader.id,
+          createdByName: `${teamLeader.firstName} ${teamLeader.lastName}`,
+          members: {
+            create: [
+              {
+                agentId: teamLeader.id,
+                agentName: `${teamLeader.firstName} ${teamLeader.lastName}`,
+                agentEmail: teamLeader.email,
+                role: 'LEADER',
+              },
+              {
+                agentId: agentRoland.id,
+                agentName: `${agentRoland.firstName} ${agentRoland.lastName}`,
+                agentEmail: agentRoland.email,
+                role: 'AGENT',
+              },
+              {
+                agentId: agentMichel.id,
+                agentName: `${agentMichel.firstName} ${agentMichel.lastName}`,
+                agentEmail: agentMichel.email,
+                role: 'AGENT',
+              },
+            ],
+          },
+          teamZones: {
+            create: [{ zoneId: zoneZongoNord.id }, { zoneId: zoneZongoSud.id }],
+          },
+          schedules: {
+            create: [
+              { zoneId: zoneZongoNord.id, dayOfWeek: 'MERCREDI', startTime: '08:00', endTime: '12:00' },
+              { zoneId: zoneZongoNord.id, dayOfWeek: 'SAMEDI', startTime: '08:00', endTime: '12:00' },
+              { zoneId: zoneZongoSud.id, dayOfWeek: 'LUNDI', startTime: '08:00', endTime: '12:00' },
+              { zoneId: zoneZongoSud.id, dayOfWeek: 'JEUDI', startTime: '08:00', endTime: '12:00' },
+            ],
+          },
+        },
+      });
 
-      update: {},
-
-      create: {
-        agentId: agent.id,
-        agentName: `${agent.firstName} ${agent.lastName}`,
-        teamLeaderId: teamLeader.id,
-        teamLeaderName: `${teamLeader.firstName} ${teamLeader.lastName}`,
-        organizationId: organization.id,
-      },
-    });
-
-    console.log(
-      '✔ Agent rattaché au chef d’équipe de démonstration',
-    );
+      console.log(
+        '✔ Équipe Zongo créée (chef Marcel, agents Roland + Michel, zones Zongo Nord/Sud, planning Mer+Sam / Lun+Jeu)',
+      );
+    }
   }
 
   console.log('🌿 Seed terminé avec succès.');
@@ -303,6 +380,7 @@ await prisma.user.upsert({
   console.log('Admin       : admin@cotonou.bj / Demo2026!');
   console.log('Chef équipe : chef.equipe@cotonou.bj / Demo2026!');
   console.log('Agent       : agent@cotonou.bj / Demo2026!');
+  console.log('Agent 2     : agent2@cotonou.bj / Demo2026!');
   console.log('Citoyen     : citoyen@example.com / Demo2026!');
   console.log('----------------------------------------------------');
 }

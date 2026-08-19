@@ -109,3 +109,61 @@ enum InterventionStatus {
     );
   }
 }
+
+/// ---------------------------------------------------------------------------
+/// DAY OF WEEK (planning de collecte)
+/// ---------------------------------------------------------------------------
+
+@JsonEnum(valueField: 'value')
+enum DayOfWeek {
+  lundi('LUNDI', 'Lundi'),
+  mardi('MARDI', 'Mardi'),
+  mercredi('MERCREDI', 'Mercredi'),
+  jeudi('JEUDI', 'Jeudi'),
+  vendredi('VENDREDI', 'Vendredi'),
+  samedi('SAMEDI', 'Samedi'),
+  dimanche('DIMANCHE', 'Dimanche');
+
+  const DayOfWeek(this.value, this.label);
+
+  /// Valeur envoyée/reçue par l'API.
+  final String value;
+
+  /// Libellé affiché dans l'application.
+  final String label;
+
+  static DayOfWeek fromString(String raw) {
+    return DayOfWeek.values.firstWhere(
+      (day) => day.value == raw,
+      orElse: () => DayOfWeek.lundi,
+    );
+  }
+}
+
+/// ---------------------------------------------------------------------------
+/// COLLECTION STATUS (mission de collecte)
+/// ---------------------------------------------------------------------------
+
+@JsonEnum(valueField: 'value')
+enum CollectionStatus {
+  planifiee('PLANIFIEE', 'Planifiée'),
+  enCours('EN_COURS', 'En cours'),
+  terminee('TERMINEE', 'Terminée'),
+  annulee('ANNULEE', 'Annulée'),
+  nonEffectuee('NON_EFFECTUEE', 'Non effectuée');
+
+  const CollectionStatus(this.value, this.label);
+
+  /// Valeur envoyée/reçue par l'API.
+  final String value;
+
+  /// Libellé affiché dans l'application.
+  final String label;
+
+  static CollectionStatus fromString(String raw) {
+    return CollectionStatus.values.firstWhere(
+      (status) => status.value == raw,
+      orElse: () => CollectionStatus.planifiee,
+    );
+  }
+}

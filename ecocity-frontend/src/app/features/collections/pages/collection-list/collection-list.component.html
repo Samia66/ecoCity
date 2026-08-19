@@ -1,0 +1,22 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Collectes du jour"
+    subtitle="Missions de collecte planifiées pour aujourd'hui"
+    icon="local_shipping"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Collectes' }]"
+  />
+
+  <eco-data-table
+    [columns]="columns"
+    [data]="collections()"
+    [loading]="loading()"
+    emptyTitle="Aucune collecte aujourd'hui"
+    emptyDescription="Aucune collecte n'est planifiée pour votre équipe aujourd'hui."
+  >
+    <ng-template #actionsTemplate let-collection>
+      <a mat-icon-button [routerLink]="['/collections', collection.id]">
+        <mat-icon>visibility</mat-icon>
+      </a>
+    </ng-template>
+  </eco-data-table>
+</div>

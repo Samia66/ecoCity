@@ -74,12 +74,40 @@ enum AuditAction {
   ASSIGN
 }
 
+enum TeamStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TeamMemberRole {
+  LEADER
+  AGENT
+}
+
+enum DayOfWeek {
+  LUNDI
+  MARDI
+  MERCREDI
+  JEUDI
+  VENDREDI
+  SAMEDI
+  DIMANCHE
+}
+
+enum CollectionStatus {
+  PLANIFIEE
+  EN_COURS
+  TERMINEE
+  ANNULEE
+  NON_EFFECTUEE
+}
+
 // ============================================================================
 // ORGANIZATION
 // ============================================================================
 
 model Organization {
-  id      String @id @default(cuid())
+  id      String  @id @default(cuid())
   name    String
   city    String
   address String?
@@ -88,12 +116,11 @@ model Organization {
   logoUrl String?
   active  Boolean @default(true)
 
-  users            User[]
-  reports          Report[]
-  categories       Category[]
-  zones            Zone[]
-  teamMemberships  TeamMembership[]
-  teams            Team[]
+  users      User[]
+  reports    Report[]
+  categories Category[]
+  zones      Zone[]
+  teams      Team[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -157,13 +184,13 @@ model User {
 
   refreshTokens           RefreshToken[]
   reports                 Report[]                 @relation("ReportAuthor")
-  assignedReports          Report[]                 @relation("AssignedReports")
-  comments                 ReportComment[]          @relation("UserComments")
-  interventions             Intervention[]           @relation("AgentInterventions")
-  notifications             Notification[]           @relation("UserNotifications")
-  auditLogs                 AuditLog[]                @relation("UserAuditLogs")
-  passwordResetTokens        PasswordResetToken[]
-  emailVerificationTokens     EmailVerificationToken[]
+  assignedReports         Report[]                 @relation("AssignedReports")
+  comments                ReportComment[]          @relation("UserComments")
+  interventions           Intervention[]           @relation("AgentInterventions")
+  notifications           Notification[]           @relation("UserNotifications")
+  auditLogs               AuditLog[]               @relation("UserAuditLogs")
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -345,10 +372,10 @@ model ReportStatusHistory {
 // ============================================================================
 
 model Intervention {
-  id       String              @id @default(cuid())
-  reportId String              @unique
+  id       String             @id @default(cuid())
+  reportId String             @unique
   agentId  String
-  status   InterventionStatus  @default(ASSIGNEE)
+  status   InterventionStatus @default(ASSIGNEE)
 
   /// Dénormalisé (pas de relation Prisma vers User) — voir note ci-dessus.
   assignedById   String
@@ -402,7 +429,7 @@ model InterventionComment {
 }
 
 model InterventionStatusHistory {
-  id             String              @id @default(cuid())
+  id             String             @id @default(cuid())
   interventionId String
   status         InterventionStatus
   comment        String?
@@ -421,7 +448,7 @@ model InterventionStatusHistory {
 // ============================================================================
 
 model Notification {
-  id       String            @id @default(cuid())
+  id       String           @id @default(cuid())
   userId   String
   type     NotificationType
   title    String
@@ -439,7 +466,7 @@ model Notification {
 }
 
 // ============================================================================
-// ZONE — découpage géographique d'une organisation, agents assignés
+// ZONE — découpage géographique d'une organisation de collecte
 // ============================================================================
 
 model Zone {
@@ -448,10 +475,11 @@ model Zone {
   description    String?
   organizationId String
 
-  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  assignments  ZoneAssignment[]
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   reports      Report[]
-  teams        Team[]
+  teamZones    TeamZone[]
+  schedules    CollectionSchedule[]
+  collections  Collection[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -460,82 +488,47 @@ model Zone {
   @@index([organizationId])
 }
 
-/// Agents assignés à une zone. `agentId`/`agentName` sont dénormalisés (pas
-/// de relation Prisma vers User) pour ne pas modifier le modèle User imposé.
-model ZoneAssignment {
-  id        String @id @default(cuid())
-  zoneId    String
-  agentId   String
-  agentName String
-
-  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@unique([zoneId, agentId])
-  @@index([agentId])
-}
-
 // ============================================================================
-// TEAM MEMBERSHIP — rattachement d'un AGENT à un TEAM_LEADER
-// ============================================================================
-
-/// Un agent est rattaché à au plus un chef d'équipe à la fois.
-/// `teamLeaderId`/`agentId` sont dénormalisés (pas de relation Prisma vers
-/// User) pour ne pas modifier le modèle User imposé.
-model TeamMembership {
-  id             String @id @default(cuid())
-  teamLeaderId   String
-  teamLeaderName String
-  agentId        String @unique
-  agentName      String
-  organizationId String
-
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([teamLeaderId])
-  @@index([organizationId])
-}
-
-// ============================================================================
-// TEAM — équipe de terrain nommée (2 à 3 agents), affectable à une zone
+// TEAM — équipe de terrain nommée (2 à 3 membres dont un chef), affectable à
+// plusieurs zones via TeamZone
 // ============================================================================
 
 model Team {
-  id             String  @id @default(cuid())
+  id             String     @id @default(cuid())
   name           String
   description    String?
+  status         TeamStatus @default(ACTIVE)
   organizationId String
-  zoneId         String?
 
-  /// Chef d'équipe créateur — dénormalisé (pas de relation Prisma vers User,
+  /// Créateur de l'équipe — dénormalisé (pas de relation Prisma vers User,
   /// modèle User imposé, cf. note sur ReportStatusHistory plus haut).
   createdById   String
   createdByName String
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  zone         Zone?        @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   members      TeamMember[]
+  teamZones    TeamZone[]
+  schedules    CollectionSchedule[]
+  collections  Collection[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   @@index([organizationId])
-  @@index([zoneId])
 }
 
+/// Membre d'une équipe — le chef d'équipe EST un membre (role = LEADER),
+/// pas un champ séparé, pour éviter de dupliquer l'information.
 /// `agentId`/`agentName`/`agentEmail` dénormalisés (pas de relation Prisma
 /// vers User) pour ne pas modifier le modèle User imposé.
 model TeamMember {
-  id         String @id @default(cuid())
+  id         String         @id @default(cuid())
   teamId     String
   agentId    String
   agentName  String
   agentEmail String
+  role       TeamMemberRole @default(AGENT)
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -544,6 +537,114 @@ model TeamMember {
   @@unique([teamId, agentId])
   @@index([teamId])
   @@index([agentId])
+}
+
+/// Affectation d'une zone à une équipe (plusieurs zones par équipe possibles).
+model TeamZone {
+  id     String @id @default(cuid())
+  teamId String
+  zoneId String
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, zoneId])
+  @@index([zoneId])
+}
+
+// ============================================================================
+// COLLECTION SCHEDULE — planning de collecte (jours de la semaine) d'une
+// zone, assurée par une équipe donnée
+// ============================================================================
+
+model CollectionSchedule {
+  id        String    @id @default(cuid())
+  zoneId    String
+  teamId    String
+  dayOfWeek DayOfWeek
+  startTime String?
+  endTime   String?
+  isActive  Boolean   @default(true)
+
+  zone        Zone         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  collections Collection[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([zoneId, teamId, dayOfWeek])
+  @@index([teamId])
+}
+
+// ============================================================================
+// COLLECTION — mission de collecte concrète pour une équipe/zone à une date
+// donnée, générée automatiquement à partir du planning. Appartient à
+// l'équipe : les participants sont les membres actuels de l'équipe, pas une
+// liste dupliquée.
+// ============================================================================
+
+model Collection {
+  id                 String           @id @default(cuid())
+  teamId             String
+  zoneId             String
+  scheduleId         String?
+  scheduledDate      DateTime
+  dayOfWeek          DayOfWeek
+  status             CollectionStatus @default(PLANIFIEE)
+  startedAt          DateTime?
+  completedAt        DateTime?
+  comment            String?
+  problemDescription String?
+  latitude           Float?
+  longitude          Float?
+
+  team     Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  zone     Zone                @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  schedule CollectionSchedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+
+  attachments CollectionAttachment[]
+  history     CollectionStatusHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([scheduleId, scheduledDate])
+  @@index([teamId])
+  @@index([zoneId])
+  @@index([status])
+}
+
+model CollectionAttachment {
+  id           String @id @default(cuid())
+  collectionId String
+  url          String
+  filename     String
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([collectionId])
+}
+
+/// `changedById`/`changedByName` dénormalisés — même convention que
+/// ReportStatusHistory/InterventionStatusHistory.
+model CollectionStatusHistory {
+  id            String           @id @default(cuid())
+  collectionId  String
+  status        CollectionStatus
+  comment       String?
+  changedById   String
+  changedByName String
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([collectionId])
 }
 
 // ============================================================================

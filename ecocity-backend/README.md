@@ -59,7 +59,13 @@ Les fichiers uploadés (photos de signalements/interventions) sont servis sur
 | Admin | `admin@cotonou.bj` | `Demo2026!` |
 | Chef d'équipe | `chef.equipe@cotonou.bj` | `Demo2026!` |
 | Agent | `agent@cotonou.bj` | `Demo2026!` |
+| Agent | `agent2@cotonou.bj` | `Demo2026!` |
 | Citoyen | `citoyen@example.com` | `Demo2026!` |
+
+Le seed crée aussi une **Équipe Zongo** de démonstration (chef `chef.equipe@cotonou.bj`,
+agents `agent@cotonou.bj` + `agent2@cotonou.bj`), affectée aux zones "Zongo Nord"
+(collecte mercredi + samedi) et "Zongo Sud" (collecte lundi + jeudi) — voir
+`GET /collections/today` une fois connecté avec l'un de ces comptes.
 
 ## Architecture
 

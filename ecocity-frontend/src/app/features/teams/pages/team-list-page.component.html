@@ -1,11 +1,13 @@
 <div class="eco-container">
   <eco-page-header
     title="Équipes"
-    subtitle="Gérez vos équipes de terrain (2 à 3 agents) et leurs zones d'intervention"
+    subtitle="Gérez vos équipes de terrain (2 à 3 membres, chef inclus) et leurs zones d'intervention"
     icon="groups"
     [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Équipes' }]"
   >
-    <eco-button icon="add" (click)="openCreate()">Nouvelle équipe</eco-button>
+    @if (canManage()) {
+      <eco-button icon="add" (click)="openCreate()">Nouvelle équipe</eco-button>
+    }
   </eco-page-header>
 
   @if (loading()) {
@@ -14,17 +16,19 @@
     <eco-empty-state
       icon="groups"
       title="Aucune équipe"
-      description="Créez votre première équipe pour commencer à organiser vos agents de terrain."
-      actionLabel="Créer une équipe"
-      (action)="openCreate()"
+      [description]="canManage() ? 'Créez votre première équipe pour commencer à organiser vos agents de terrain.' : 'Vous ne faites partie d’aucune équipe pour le moment.'"
+      [actionLabel]="canManage() ? 'Créer une équipe' : ''"
+      (action)="canManage() && openCreate()"
     />
   } @else {
     <div class="eco-team-grid">
       @for (team of teams(); track team.id) {
         <eco-team-card
           [team]="team"
+          [canManage]="canManage()"
           (manageMembers)="openMembers($event)"
           (assignZone)="openZone($event)"
+          (assignLeader)="openLeader($event)"
           (edit)="openEdit($event)"
           (remove)="remove($event)"
         />

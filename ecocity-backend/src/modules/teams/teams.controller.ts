@@ -20,6 +20,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { AddTeamMemberDto } from './dto/add-team-member.dto';
 import { AssignTeamZoneDto } from './dto/assign-team-zone.dto';
+import { AssignLeaderDto } from './dto/assign-leader.dto';
 
 @Controller('teams')
 @Roles(RoleName.SUPER_ADMIN, RoleName.ADMIN, RoleName.TEAM_LEADER, RoleName.AGENT)
@@ -83,22 +84,38 @@ export class TeamsController {
     return this.teamsService.removeMember(id, agentId, user);
   }
 
-  // --- Affectation de zone ---------------------------------------------
+  // --- Chef d'équipe -----------------------------------------------------
 
-  @Post(':id/zone')
+  @Patch(':id/leader')
   @RequirePermissions(PermissionCode.TEAMS_MANAGE)
-  assignZone(
+  assignLeader(
+    @Param('id') id: string,
+    @Body() dto: AssignLeaderDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.teamsService.assignLeader(id, dto.agentId, user);
+  }
+
+  // --- Zones (plusieurs zones par équipe) -------------------------------
+
+  @Post(':id/zones')
+  @RequirePermissions(PermissionCode.TEAMS_MANAGE)
+  addZone(
     @Param('id') id: string,
     @Body() dto: AssignTeamZoneDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.teamsService.assignZone(id, dto, user);
+    return this.teamsService.addZone(id, dto.zoneId, user);
   }
 
-  @Delete(':id/zone')
+  @Delete(':id/zones/:zoneId')
   @RequirePermissions(PermissionCode.TEAMS_MANAGE)
   @HttpCode(HttpStatus.NO_CONTENT)
-  unassignZone(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
-    return this.teamsService.unassignZone(id, user);
+  removeZone(
+    @Param('id') id: string,
+    @Param('zoneId') zoneId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.teamsService.removeZone(id, zoneId, user);
   }
 }

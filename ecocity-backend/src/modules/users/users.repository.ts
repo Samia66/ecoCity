@@ -64,49 +64,8 @@ export class UsersRepository {
     });
   }
 
-  // --- Team membership (AGENT -> TEAM_LEADER) -----------------------------
-
-  upsertTeamMembership(params: {
-    agentId: string;
-    agentName: string;
-    teamLeaderId: string;
-    teamLeaderName: string;
-    organizationId: string;
-  }) {
-    return this.prisma.teamMembership.upsert({
-      where: { agentId: params.agentId },
-      create: params,
-      update: {
-        teamLeaderId: params.teamLeaderId,
-        teamLeaderName: params.teamLeaderName,
-      },
-    });
-  }
-
-  removeTeamMembership(agentId: string) {
-    return this.prisma.teamMembership.deleteMany({ where: { agentId } });
-  }
-
-  findTeamMembersOf(teamLeaderId: string) {
-    return this.prisma.teamMembership.findMany({ where: { teamLeaderId }, orderBy: { agentName: 'asc' } });
-  }
-
-  findTeamMembership(agentId: string) {
-    return this.prisma.teamMembership.findUnique({ where: { agentId } });
-  }
-
-  // --- Zone assignment -----------------------------------------------------
-
-  async replaceZoneAssignments(agentId: string, agentName: string, zoneIds: string[]): Promise<void> {
-    await this.prisma.$transaction([
-      this.prisma.zoneAssignment.deleteMany({ where: { agentId } }),
-      ...zoneIds.map((zoneId) =>
-        this.prisma.zoneAssignment.create({ data: { zoneId, agentId, agentName } }),
-      ),
-    ]);
-  }
-
-  findZoneAssignmentsOf(agentId: string) {
-    return this.prisma.zoneAssignment.findMany({ where: { agentId }, include: { zone: true } });
+  /** Retire cet utilisateur de toute équipe (chef ou agent) — appelé à la suppression d'un compte. */
+  removeFromAllTeams(agentId: string): Promise<void> {
+    return this.prisma.teamMember.deleteMany({ where: { agentId } }).then(() => undefined);
   }
 }

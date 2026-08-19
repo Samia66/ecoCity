@@ -48,13 +48,19 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Équipes',
     icon: 'groups',
     route: '/teams',
-    permission: 'teams.manage',
+    permission: 'teams.view',
   },
   {
     label: 'Zones',
     icon: 'map',
     route: '/zones',
-    permission: 'zones.manage',
+    permission: 'zones.view',
+  },
+  {
+    label: 'Collectes',
+    icon: 'local_shipping',
+    route: '/collections',
+    permission: 'collections.view',
   },
   {
     label: 'Rôles',

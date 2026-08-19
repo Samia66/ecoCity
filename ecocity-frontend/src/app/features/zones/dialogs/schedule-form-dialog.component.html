@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Modifier le planning' : 'Nouveau jour de collecte' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="eco-dialog-form">
+    <mat-form-field appearance="outline" class="eco-form-field">
+      <mat-label>Équipe responsable</mat-label>
+      <mat-select formControlName="teamId">
+        @for (team of zoneTeams; track team.id) {
+          <mat-option [value]="team.id">{{ team.name }}</mat-option>
+        }
+      </mat-select>
+      @if (zoneTeams.length === 0) {
+        <mat-error>Affectez d'abord une équipe à cette zone.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="eco-form-field">
+      <mat-label>Jour de la semaine</mat-label>
+      <mat-select formControlName="dayOfWeek">
+        @for (day of days; track day) {
+          <mat-option [value]="day">{{ dayLabels[day] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="eco-form-field">
+      <mat-label>Heure de début</mat-label>
+      <input matInput formControlName="startTime" placeholder="Ex : 08:00" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="eco-form-field">
+      <mat-label>Heure de fin</mat-label>
+      <input matInput formControlName="endTime" placeholder="Ex : 12:00" />
+    </mat-form-field>
+
+    <mat-checkbox formControlName="isActive">Planning actif</mat-checkbox>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Annuler</button>
+  <eco-button [loading]="submitting()" [disabled]="zoneTeams.length === 0" (click)="submit()">
+    {{ isEdit ? 'Enregistrer' : 'Ajouter' }}
+  </eco-button>
+</mat-dialog-actions>

@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 
-/// [ Dashboard ] [ Équipe ] [ Interventions ] [ Profil ]
+/// [ Dashboard ] [ Équipe ] [ Interventions ] [ Collectes ] [ Profil ]
 class TeamLeaderHomeShell extends StatelessWidget {
   const TeamLeaderHomeShell({super.key, required this.child});
   final Widget child;
@@ -12,6 +12,7 @@ class TeamLeaderHomeShell extends StatelessWidget {
     AppRoutes.teamLeaderDashboard,
     AppRoutes.teamLeaderTeam,
     AppRoutes.teamLeaderAssign,
+    AppRoutes.teamLeaderCollections,
     AppRoutes.teamLeaderProfile,
   ];
 
@@ -34,6 +35,7 @@ class TeamLeaderHomeShell extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'Dashboard'),
           NavigationDestination(icon: Icon(Icons.groups_outlined), selectedIcon: Icon(Icons.groups), label: 'Équipe'),
           NavigationDestination(icon: Icon(Icons.assignment_outlined), selectedIcon: Icon(Icons.assignment), label: 'Interventions'),
+          NavigationDestination(icon: Icon(Icons.local_shipping_outlined), selectedIcon: Icon(Icons.local_shipping), label: 'Collectes'),
           NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profil'),
         ],
       ),

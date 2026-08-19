@@ -3,8 +3,8 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 const WITH_RELATIONS = {
-  members: { orderBy: { agentName: 'asc' } },
-  zone: true,
+  members: { orderBy: [{ role: 'asc' }, { agentName: 'asc' }] },
+  teamZones: { include: { zone: true }, orderBy: { zone: { name: 'asc' } } },
 } satisfies Prisma.TeamInclude;
 
 export type TeamWithRelations = Prisma.TeamGetPayload<{ include: typeof WITH_RELATIONS }>;
@@ -21,7 +21,7 @@ export class TeamsRepository {
     });
   }
 
-  /** Équipe dont `agentId` est membre (un agent appartient à au plus une équipe). */
+  /** Équipe dont `agentId` est membre — chef ou agent (un utilisateur appartient à au plus une équipe). */
   findByMemberAgentId(organizationId: string, agentId: string): Promise<TeamWithRelations | null> {
     return this.prisma.team.findFirst({
       where: { organizationId, deletedAt: null, members: { some: { agentId } } },
@@ -57,11 +57,45 @@ export class TeamsRepository {
       .then(() => undefined);
   }
 
-  /** Toute équipe (autre que `excludeTeamId`) dont cet agent est déjà membre. */
+  /**
+   * Toute équipe ACTIVE (autre que `excludeTeamId`) dont cet utilisateur est
+   * déjà membre (chef ou agent) — un utilisateur ne peut appartenir qu'à une
+   * seule équipe active à la fois.
+   */
   findExistingMembershipForAgent(agentId: string, excludeTeamId?: string) {
     return this.prisma.teamMember.findFirst({
-      where: { agentId, ...(excludeTeamId ? { teamId: { not: excludeTeamId } } : {}) },
+      where: {
+        agentId,
+        ...(excludeTeamId ? { teamId: { not: excludeTeamId } } : {}),
+        team: { status: 'ACTIVE', deletedAt: null },
+      },
       include: { team: true },
     });
+  }
+
+  // --- Zones -----------------------------------------------------------
+
+  addZone(teamId: string, zoneId: string) {
+    return this.prisma.teamZone.create({ data: { team: { connect: { id: teamId } }, zone: { connect: { id: zoneId } } } });
+  }
+
+  removeZone(teamId: string, zoneId: string): Promise<void> {
+    return this.prisma.teamZone
+      .deleteMany({ where: { teamId, zoneId } })
+      .then(() => undefined);
+  }
+
+  findZoneAssignment(teamId: string, zoneId: string) {
+    return this.prisma.teamZone.findUnique({ where: { teamId_zoneId: { teamId, zoneId } } });
+  }
+
+  /** Jours de collecte distincts, actifs, sur l'ensemble des zones de l'équipe — pour l'affichage résumé `/teams`. */
+  async findActiveScheduleDays(teamId: string) {
+    const rows = await this.prisma.collectionSchedule.findMany({
+      where: { teamId, isActive: true },
+      select: { dayOfWeek: true },
+      distinct: ['dayOfWeek'],
+    });
+    return rows.map((r) => r.dayOfWeek);
   }
 }

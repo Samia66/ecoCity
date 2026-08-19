@@ -1,0 +1,81 @@
+<div class="eco-container">
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement de la zone..." />
+  } @else if (zone(); as z) {
+    <eco-page-header
+      [title]="z.name"
+      [subtitle]="z.description || 'Planning de collecte'"
+      icon="map"
+      [breadcrumbs]="[
+        { label: 'Dashboard', route: '/dashboard' },
+        { label: 'Zones', route: '/zones' },
+        { label: z.name },
+      ]"
+    />
+
+    <eco-card class="eco-zone-detail__teams-card">
+      <h4>Équipes responsables</h4>
+      @if (z.teams && z.teams.length > 0) {
+        <div class="eco-zone-detail__teams">
+          @for (team of z.teams; track team.id) {
+            <span class="eco-badge">{{ team.name }}</span>
+          }
+        </div>
+      } @else {
+        <p class="eco-zone-detail__empty-hint">
+          Aucune équipe affectée — affectez une équipe à cette zone depuis
+          <a routerLink="/teams">la page Équipes</a> avant de créer un planning.
+        </p>
+      }
+    </eco-card>
+
+    <div class="eco-zone-detail__header-row">
+      <h4>Jours de collecte</h4>
+      @if (canManage()) {
+        <button mat-flat-button color="primary" (click)="openCreate()">
+          <mat-icon>add</mat-icon>
+          Ajouter un jour
+        </button>
+      }
+    </div>
+
+    @if (schedules().length === 0) {
+      <eco-empty-state
+        icon="event"
+        title="Aucun planning"
+        [description]="canManage() ? 'Ajoutez les jours de la semaine où cette zone est collectée.' : 'Aucun jour de collecte planifié pour le moment.'"
+        [actionLabel]="canManage() ? 'Ajouter un jour' : ''"
+        (action)="canManage() && openCreate()"
+      />
+    } @else {
+      <div class="eco-zone-detail__schedule-list">
+        @for (schedule of schedules(); track schedule.id) {
+          <eco-card class="eco-zone-detail__schedule-row">
+            <div class="eco-zone-detail__schedule-info">
+              <span class="eco-zone-detail__schedule-day">{{ dayLabels[schedule.dayOfWeek] }}</span>
+              <span class="eco-zone-detail__schedule-team">{{ schedule.teamName }}</span>
+              @if (schedule.startTime || schedule.endTime) {
+                <span class="eco-zone-detail__schedule-time">
+                  {{ schedule.startTime || '?' }} – {{ schedule.endTime || '?' }}
+                </span>
+              }
+              @if (!schedule.isActive) {
+                <span class="eco-badge eco-badge--muted">Inactif</span>
+              }
+            </div>
+            @if (canManage()) {
+              <div class="eco-zone-detail__schedule-actions">
+                <button mat-icon-button (click)="openEdit(schedule)" matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="remove(schedule)" matTooltip="Supprimer">
+                  <mat-icon color="warn">delete_outline</mat-icon>
+                </button>
+              </div>
+            }
+          </eco-card>
+        }
+      </div>
+    }
+  }
+</div>

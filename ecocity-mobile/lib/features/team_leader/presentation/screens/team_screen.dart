@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../data/team_leader_repository.dart';
 import '../../../shared/domain/models/intervention_model.dart';
+import '../../../shared/data/collection_repository.dart';
 
 class TeamScreen extends ConsumerWidget {
   const TeamScreen({super.key});
@@ -12,23 +13,49 @@ class TeamScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final agentsAsync = ref.watch(teamAgentsProvider);
+    final zonesAsync = ref.watch(myZonesProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Équipe')),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(teamAgentsProvider.future),
+        onRefresh: () => Future.wait([
+          ref.refresh(teamAgentsProvider.future),
+          ref.refresh(myZonesProvider.future),
+        ]),
         child: agentsAsync.when(
           data: (agents) {
-            if (agents.isEmpty) {
-              return ListView(
-                children: const [SizedBox(height: 80), Center(child: Text('Aucun agent.'))],
-              );
-            }
-            return ListView.separated(
+            return ListView(
               padding: const EdgeInsets.all(16),
-              itemCount: agents.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (context, i) => _AgentCard(agent: agents[i]),
+              children: [
+                Text('Zones couvertes', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                zonesAsync.when(
+                  data: (zones) => zones.isEmpty
+                      ? const Text('Aucune zone affectée à votre équipe.')
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: zones.map((z) => Chip(label: Text(z.name))).toList(),
+                        ),
+                  loading: () => const SizedBox(height: 32, child: LinearProgressIndicator()),
+                  error: (e, _) => const Text('Impossible de charger les zones.'),
+                ),
+                const SizedBox(height: 20),
+                Text('Membres de l\'équipe', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                if (agents.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text('Aucun agent.')),
+                  )
+                else
+                  ...agents.map(
+                    (agent) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _AgentCard(agent: agent),
+                    ),
+                  ),
+              ],
             );
           },
           loading: () => Shimmer.fromColors(

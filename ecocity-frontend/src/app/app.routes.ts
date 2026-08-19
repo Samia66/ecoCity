@@ -52,13 +52,18 @@ export const routes: Routes = [
         path: 'teams',
         loadComponent: () =>
           import('./features/teams/pages/team-list-page.component').then((m) => m.TeamListPageComponent),
-        canActivate: [permissionGuard('teams.manage')],
+        canActivate: [permissionGuard('teams.view')],
+        title: 'Équipes | EcoCity',
       },
       {
         path: 'zones',
-        loadComponent: () =>
-          import('./features/zones/pages/zone-list-page.component').then((m) => m.ZoneListPageComponent),
-        canActivate: [permissionGuard('zones.manage')],
+        loadChildren: () => import('./features/zones/routes').then((m) => m.ZONES_ROUTES),
+        canActivate: [permissionGuard('zones.view')],
+      },
+      {
+        path: 'collections',
+        loadChildren: () => import('./features/collections/routes').then((m) => m.COLLECTIONS_ROUTES),
+        canActivate: [permissionGuard('collections.view')],
       },
       {
         path: 'roles',

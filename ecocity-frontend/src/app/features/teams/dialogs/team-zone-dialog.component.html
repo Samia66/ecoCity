@@ -1,16 +1,10 @@
-<h2 mat-dialog-title>Affecter une zone — « {{ team.name }} »</h2>
+<h2 mat-dialog-title>Zones de l'équipe « {{ team.name }} »</h2>
 
 <mat-dialog-content>
   @if (loading()) {
     <eco-loading-spinner label="Chargement des zones..." />
   } @else {
-    @if (team.zoneName) {
-      <p class="eco-team-zone__current">
-        Zone actuelle : <strong>{{ team.zoneName }}</strong>
-      </p>
-    } @else {
-      <p class="eco-team-zone__current eco-team-zone__current--empty">Aucune zone affectée actuellement.</p>
-    }
+    <p class="eco-team-members__hint">Sélectionnez les zones couvertes par cette équipe.</p>
 
     @if (errorMessage()) {
       <div class="eco-form-backend-error">
@@ -20,17 +14,21 @@
     }
 
     @if (zones().length === 0) {
-      <p class="eco-team-zone__empty">Aucune zone n'est disponible. Créez-en une depuis l'écran « Zones ».</p>
+      <p class="eco-team-members__empty">Aucune zone disponible dans votre organisation.</p>
     } @else {
-      <mat-form-field appearance="outline" class="eco-form-field">
-        <mat-label>Zone</mat-label>
-        <mat-select [(ngModel)]="selectedZoneId">
-          <mat-option [value]="null">Aucune zone</mat-option>
-          @for (zone of zones(); track zone.id) {
-            <mat-option [value]="zone.id">{{ zone.name }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+      <div class="eco-team-members__list">
+        @for (zone of zones(); track zone.id) {
+          <label class="eco-team-members__item">
+            <mat-checkbox [checked]="isSelected(zone.id)" (change)="toggle(zone.id)"></mat-checkbox>
+            <div class="eco-team-members__item-info">
+              <span class="eco-team-members__item-name">{{ zone.name }}</span>
+              @if (zone.description) {
+                <span class="eco-team-members__item-email">{{ zone.description }}</span>
+              }
+            </div>
+          </label>
+        }
+      </div>
     }
   }
 </mat-dialog-content>

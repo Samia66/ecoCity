@@ -36,6 +36,15 @@ class ApiEndpoints {
   static const String teamAgents = '/team/agents';
   static String agentById(String id) => '/team/agents/$id';
   static const String teamStats = '/team/stats';
+  static const String myZones = '/team/zones';
+
+  // ---- Collections (missions de collecte planifiées, AGENT / TEAM_LEADER) --
+  static const String todayCollections = '/collections/today';
+  static const String myTeamCollections = '/collections/my-team';
+  static String collectionById(String id) => '/collections/$id';
+  static String startCollection(String id) => '/collections/$id/start';
+  static String completeCollection(String id) => '/collections/$id/complete';
+  static String collectionProblem(String id) => '/collections/$id/problem';
 
   // ---- Dashboard -----------------------------------------------------------
   static const String citizenStats = '/dashboard/citizen';

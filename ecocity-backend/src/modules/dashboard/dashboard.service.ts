@@ -4,6 +4,7 @@ import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { UsersRepository } from '../users/users.repository';
 import { InterventionsRepository } from '../interventions/interventions.repository';
 import { InterventionsMapper } from '../interventions/interventions.mapper';
+import { TeamsRepository } from '../teams/teams.repository';
 import { DashboardRepository } from './dashboard.repository';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class DashboardService {
     private readonly usersRepository: UsersRepository,
     private readonly interventionsRepository: InterventionsRepository,
     private readonly interventionsMapper: InterventionsMapper,
+    private readonly teamsRepository: TeamsRepository,
   ) {}
 
   // ------------------------------------------------------------------
@@ -103,9 +105,10 @@ export class DashboardService {
   //                 statusBreakdown[], agentLoad[], weeklyTrend[] }
   // ------------------------------------------------------------------
   async getTeamLeaderDashboard(requester: AuthenticatedUser) {
-    const memberships = await this.usersRepository.findTeamMembersOf(requester.userId);
-    const agentIds = memberships.map((m) => m.agentId);
-    const agents = memberships.map((m) => ({ id: m.agentId, name: m.agentName }));
+    const team = await this.teamsRepository.findByMemberAgentId(requester.organizationId, requester.userId);
+    const agentMembers = team?.members.filter((m) => m.role === 'AGENT') ?? [];
+    const agentIds = agentMembers.map((m) => m.agentId);
+    const agents = agentMembers.map((m) => ({ id: m.agentId, name: m.agentName }));
 
     const [activeAgents, availableAgents, unassignedCount, criticalCount, lateCount, statusBreakdownRaw, agentLoad, weeklyTrend] =
       await Promise.all([

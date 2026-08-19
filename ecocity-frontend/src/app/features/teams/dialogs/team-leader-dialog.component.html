@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Chef d'équipe — {{ team.name }}</h2>
+<mat-dialog-content>
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des chefs d'équipe..." />
+  } @else {
+    @if (errorMessage()) {
+      <div class="eco-form-backend-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+    <mat-form-field appearance="outline" class="eco-form-field">
+      <mat-label>Chef d'équipe</mat-label>
+      <mat-select [(ngModel)]="selectedLeaderId">
+        @for (leader of leaders(); track leader.id) {
+          <mat-option [value]="leader.id">{{ leader.firstName }} {{ leader.lastName }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Annuler</button>
+  <eco-button [loading]="saving()" [disabled]="!selectedLeaderId" (click)="save()">Enregistrer</eco-button>
+</mat-dialog-actions>

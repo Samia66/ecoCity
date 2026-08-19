@@ -19,4 +19,6 @@ export const ENDPOINTS = {
   permissions: '/permissions',
   teams: '/teams',
   zones: '/zones',
+  schedules: '/schedules',
+  collections: '/collections',
 } as const;

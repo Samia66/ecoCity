@@ -1,0 +1,42 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+
+.eco-collection-detail__problem {
+  color: #B45309;
+  background: #FFFBEB;
+  border-radius: $radius-md;
+  padding: $space-2;
+  font-size: 13px;
+}
+
+.eco-collection-detail__actions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-top: $space-3;
+}
+
+.eco-collection-detail__participants {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.eco-collection-detail__photos {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.eco-badge {
+  background: $secondary-light;
+  color: $secondary;
+  border-radius: $radius-md;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: $space-2;
+}

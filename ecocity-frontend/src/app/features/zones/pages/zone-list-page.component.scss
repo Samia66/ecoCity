@@ -86,6 +86,22 @@
   color: $text-secondary;
 }
 
+.eco-zone-card__teams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-1;
+  margin-top: $space-2;
+
+  .eco-badge {
+    background: $secondary-light;
+    color: $secondary;
+    border-radius: $radius-md;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+}
+
 .eco-zone-card__actions {
   display: flex;
   justify-content: flex-end;

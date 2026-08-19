@@ -1,10 +1,16 @@
+export interface ZoneTeamRef {
+  id: string;
+  name: string;
+}
+
 export interface Zone {
   id: string;
   name: string;
   description?: string;
-  agentsCount?: number;
-  /** Nombre d'équipes actuellement affectées à cette zone. */
+  /** Équipes actuellement responsables de la collecte dans cette zone. */
+  teams?: ZoneTeamRef[];
   teamsCount?: number;
+  reportsCount?: number;
   createdAt?: string;
 }
 

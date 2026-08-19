@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -8,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ZoneService } from '../services/zone.service';
 import { Zone } from '../models/zone.model';
+import { AuthStore } from '../../../core/store/auth.store';
 import { PageHeaderComponent } from '../../../core/layout/components/page-header/page-header.component';
 import { CardComponent } from '../../../shared/ui/card/card.component';
 import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
@@ -20,6 +22,7 @@ import { ZoneFormDialogComponent } from '../dialogs/zone-form-dialog.component';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
@@ -35,9 +38,11 @@ export class ZoneListPageComponent implements OnInit {
   private zoneService = inject(ZoneService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private authStore = inject(AuthStore);
 
   loading = signal(true);
   zones = signal<Zone[]>([]);
+  canManage = computed(() => this.authStore.hasPermission('zones.manage'));
 
   ngOnInit(): void {
     this.fetch();
