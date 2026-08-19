@@ -1,0 +1,26 @@
+@use "abstracts/colors" as *;
+@use "abstracts/spacing" as *;
+
+:host {
+  display: block;
+  min-width: 380px;
+
+  @media (max-width: 599px) { min-width: unset; }
+}
+
+.eco-team-zone__current {
+  font-size: 13px;
+  color: $text-primary;
+  margin-bottom: $space-4;
+
+  &--empty {
+    color: $text-secondary;
+    font-style: italic;
+  }
+}
+
+.eco-team-zone__empty {
+  font-size: 13px;
+  color: $text-secondary;
+  font-style: italic;
+}

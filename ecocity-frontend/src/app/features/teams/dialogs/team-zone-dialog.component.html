@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Affecter une zone — « {{ team.name }} »</h2>
+
+<mat-dialog-content>
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des zones..." />
+  } @else {
+    @if (team.zoneName) {
+      <p class="eco-team-zone__current">
+        Zone actuelle : <strong>{{ team.zoneName }}</strong>
+      </p>
+    } @else {
+      <p class="eco-team-zone__current eco-team-zone__current--empty">Aucune zone affectée actuellement.</p>
+    }
+
+    @if (errorMessage()) {
+      <div class="eco-form-backend-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (zones().length === 0) {
+      <p class="eco-team-zone__empty">Aucune zone n'est disponible. Créez-en une depuis l'écran « Zones ».</p>
+    } @else {
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Zone</mat-label>
+        <mat-select [(ngModel)]="selectedZoneId">
+          <mat-option [value]="null">Aucune zone</mat-option>
+          @for (zone of zones(); track zone.id) {
+            <mat-option [value]="zone.id">{{ zone.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Annuler</button>
+  <eco-button [loading]="saving()" [disabled]="loading()" (click)="save()">Enregistrer</eco-button>
+</mat-dialog-actions>

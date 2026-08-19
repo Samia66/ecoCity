@@ -1,0 +1,68 @@
+<div class="eco-container eco-zone-page">
+  <eco-page-header
+    title="Zones"
+    subtitle="Découpage géographique et couverture des équipes de terrain"
+    icon="map"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Zones' }]"
+  />
+
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des zones..." />
+  } @else if (zones().length === 0) {
+    <eco-empty-state
+      icon="map"
+      title="Aucune zone"
+      description="Créez votre première zone pour organiser la couverture géographique de vos équipes."
+      actionLabel="Créer une zone"
+      (action)="openCreate()"
+    />
+  } @else {
+    <div class="eco-zone-grid">
+      @for (zone of zones(); track zone.id) {
+        <eco-card class="eco-zone-card eco-card--hover">
+          <div class="eco-zone-card__header">
+            <div class="eco-zone-card__icon"><mat-icon>map</mat-icon></div>
+            <div class="eco-zone-card__title-block">
+              <h4>{{ zone.name }}</h4>
+              @if (zone.description) {
+                <p>{{ zone.description }}</p>
+              } @else {
+                <p class="eco-zone-card__description--empty">Aucune description</p>
+              }
+            </div>
+          </div>
+
+          <div class="eco-zone-card__stats">
+            <div class="eco-zone-card__stat">
+              <span class="eco-zone-card__stat-value">{{ zone.teamsCount ?? 0 }}</span>
+              <span class="eco-zone-card__stat-label">équipe(s) affectée(s)</span>
+            </div>
+            <div class="eco-zone-card__stat">
+              <span class="eco-zone-card__stat-value">{{ zone.agentsCount ?? 0 }}</span>
+              <span class="eco-zone-card__stat-label">agent(s) couvert(s)</span>
+            </div>
+          </div>
+
+          <div class="eco-zone-card__actions">
+            <button mat-icon-button (click)="openEdit(zone)" matTooltip="Modifier">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="remove(zone)" matTooltip="Supprimer">
+              <mat-icon color="warn">delete_outline</mat-icon>
+            </button>
+          </div>
+        </eco-card>
+      }
+    </div>
+  }
+
+  <button
+    mat-fab
+    color="primary"
+    class="eco-zone-page__fab"
+    matTooltip="Nouvelle zone"
+    (click)="openCreate()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

@@ -41,4 +41,6 @@ export class AuthStore {
     this._currentUser.set(null);
     this._isAuthenticated.set(false);
   }
+
+  
 }

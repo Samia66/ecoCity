@@ -9,7 +9,7 @@ export const ENDPOINTS = {
     verifyEmail: '/auth/verify-email',
     profile: '/auth/profile',
   },
-  dashboard: '/dashboard/overview',
+  dashboard: '/dashboard',
   reports: '/reports',
   interventions: '/interventions',
   users: '/users',
@@ -17,4 +17,6 @@ export const ENDPOINTS = {
   categories: '/categories',
   roles: '/roles',
   permissions: '/permissions',
+  teams: '/teams',
+  zones: '/zones',
 } as const;

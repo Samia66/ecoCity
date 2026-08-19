@@ -37,9 +37,9 @@ export class UserListComponent implements OnInit {
   ];
 
   private readonly MOCK: UserItem[] = [
-    { id: 'u1', firstName: 'Olivia', lastName: 'Fanou', email: 'o.fanou@cotonou.bj', role: 'ADMIN_ORGANISATION', organizationName: 'Mairie de Cotonou', organizationId: 'o1', active: true, createdAt: '2026-01-10' },
+    { id: 'u1', firstName: 'Olivia', lastName: 'Fanou', email: 'o.fanou@cotonou.bj', role: 'ADMIN', organizationName: 'Mairie de Cotonou', organizationId: 'o1', active: true, createdAt: '2026-01-10' },
     { id: 'u2', firstName: 'Roland', lastName: 'Dansou', email: 'r.dansou@cotonou.bj', role: 'AGENT', organizationName: 'Mairie de Cotonou', organizationId: 'o1', active: true, createdAt: '2026-02-14' },
-    { id: 'u3', firstName: 'Aïcha', lastName: 'Kouassi', email: 'a.kouassi@gmail.com', role: 'CITOYEN', organizationName: '-', organizationId: '', active: true, createdAt: '2026-03-02' },
+    { id: 'u3', firstName: 'Aïcha', lastName: 'Kouassi', email: 'a.kouassi@gmail.com', role: 'CITIZEN', organizationName: '-', organizationId: '', active: true, createdAt: '2026-03-02' },
   ];
 
   ngOnInit(): void {

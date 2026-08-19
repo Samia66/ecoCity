@@ -39,7 +39,7 @@ export class InterventionListComponent implements OnInit {
 
   ngOnInit(): void {
     this.interventionService.getAll().subscribe({
-      next: (res) => { this.interventions.set(res.data); this.loading.set(false); },
+      next: (res) => { this.interventions.set(res); this.loading.set(false); },
       error: () => { this.interventions.set(this.MOCK); this.loading.set(false); },
     });
   }

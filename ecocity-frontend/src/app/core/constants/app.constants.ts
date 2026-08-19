@@ -12,7 +12,7 @@ export type ReportStatus =
 
 export type ReportPriority = 'BASSE' | 'MOYENNE' | 'HAUTE' | 'CRITIQUE';
 
-export type UserRole = 'SUPER_ADMIN' | 'ADMIN_ORGANISATION' | 'AGENT' | 'CITOYEN';
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'TEAM_LEADER' | 'AGENT' | 'CITIZEN';
 
 export const STATUS_LABELS: Record<ReportStatus, string> = {
   NOUVEAU: 'Nouveau',
@@ -52,9 +52,10 @@ export const PRIORITY_COLORS: Record<ReportPriority, { bg: string; text: string 
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   SUPER_ADMIN: 'Super Admin',
-  ADMIN_ORGANISATION: "Admin d'organisation",
+  ADMIN: "Administrateur",
+  TEAM_LEADER: "Chef d'équipe",
   AGENT: 'Agent / Technicien',
-  CITOYEN: 'Citoyen',
+  CITIZEN: 'Citoyen',
 };
 
 export const REPORT_TYPES = [

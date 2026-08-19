@@ -1,29 +1,56 @@
-<h2 mat-dialog-title>{{ isEdit ? "Modifier l'utilisateur" : 'Nouvel utilisateur' }}</h2>
-<mat-dialog-content>
-  <form [formGroup]="form" class="eco-dialog-form">
-    <div class="eco-form-row">
-      <mat-form-field appearance="outline" class="eco-form-field">
-        <mat-label>Prénom</mat-label>
-        <input matInput formControlName="firstName" />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="eco-form-field">
-        <mat-label>Nom</mat-label>
-        <input matInput formControlName="lastName" />
-      </mat-form-field>
+@if (temporaryPassword()) {
+  <h2 mat-dialog-title>Compte créé avec succès</h2>
+  <mat-dialog-content>
+    <p class="eco-temp-password__intro">
+      Communiquez ce mot de passe temporaire à l'utilisateur. Il devra le changer
+      dès sa première connexion. <strong>Il ne sera plus affiché ensuite.</strong>
+    </p>
+    <div class="eco-temp-password__box">
+      <code>{{ temporaryPassword() }}</code>
+      <button mat-icon-button (click)="copyPassword()" matTooltip="Copier">
+        <mat-icon>content_copy</mat-icon>
+      </button>
     </div>
-    <mat-form-field appearance="outline" class="eco-form-field">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" />
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="eco-form-field">
-      <mat-label>Rôle</mat-label>
-      <mat-select formControlName="role">
-        @for (r of roles; track r[0]) { <mat-option [value]="r[0]">{{ r[1] }}</mat-option> }
-      </mat-select>
-    </mat-form-field>
-  </form>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-stroked-button mat-dialog-close>Annuler</button>
-  <eco-button [loading]="submitting()" (click)="submit()">{{ isEdit ? 'Enregistrer' : 'Créer' }}</eco-button>
-</mat-dialog-actions>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <eco-button (click)="finish()">Terminé</eco-button>
+  </mat-dialog-actions>
+} @else {
+  <h2 mat-dialog-title>{{ isEdit ? "Modifier l'utilisateur" : 'Nouvel utilisateur' }}</h2>
+  <mat-dialog-content>
+    <form [formGroup]="form" class="eco-dialog-form">
+      <div class="eco-form-row">
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Prénom</mat-label>
+          <input matInput formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="eco-form-field">
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="lastName" />
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" [readonly]="isEdit" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="eco-form-field">
+        <mat-label>Rôle</mat-label>
+        <mat-select formControlName="role">
+          @for (r of roles; track r[0]) { <mat-option [value]="r[0]">{{ r[1] }}</mat-option> }
+        </mat-select>
+        @if (isEdit) {
+          <mat-hint>Le rôle ne peut pas être modifié après création.</mat-hint>
+        }
+      </mat-form-field>
+      @if (!isEdit) {
+        <p class="eco-form-hint">
+          Un mot de passe temporaire sera généré automatiquement et affiché une seule fois.
+        </p>
+      }
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button mat-dialog-close>Annuler</button>
+    <eco-button [loading]="submitting()" (click)="submit()">{{ isEdit ? 'Enregistrer' : 'Créer' }}</eco-button>
+  </mat-dialog-actions>
+}

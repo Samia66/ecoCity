@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { permissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
   {
@@ -46,6 +47,18 @@ export const routes: Routes = [
       {
         path: 'categories',
         loadChildren: () => import('./features/categories/routes').then((m) => m.CATEGORIES_ROUTES),
+      },
+      {
+        path: 'teams',
+        loadComponent: () =>
+          import('./features/teams/pages/team-list-page.component').then((m) => m.TeamListPageComponent),
+        canActivate: [permissionGuard('teams.manage')],
+      },
+      {
+        path: 'zones',
+        loadComponent: () =>
+          import('./features/zones/pages/zone-list-page.component').then((m) => m.ZoneListPageComponent),
+        canActivate: [permissionGuard('zones.manage')],
       },
       {
         path: 'roles',

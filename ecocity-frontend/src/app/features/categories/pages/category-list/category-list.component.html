@@ -16,7 +16,6 @@
     <div class="eco-category-grid">
       @for (category of categories(); track category.id) {
         <eco-card class="eco-category-card eco-card--hover" (click)="openEdit(category)">
-          <div class="eco-category-card__icon"><mat-icon>{{ category.icon }}</mat-icon></div>
           <div class="eco-category-card__body">
             <h4>{{ category.name }}</h4>
             <span>{{ category.reportsCount }} signalements</span>

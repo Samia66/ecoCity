@@ -9,6 +9,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { InputComponent } from '../../../../shared/ui/input/input.component';
 import { PasswordInputComponent } from '../../../../shared/ui/password-input/password-input.component';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
+import { AuthStore } from '../../../../core/store/auth.store';
 
 @Component({
   selector: 'eco-login',
@@ -30,7 +31,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
-
+private authStore = inject(AuthStore);
   loading = signal(false);
   backendError = signal('');
 
@@ -58,6 +59,7 @@ export class LoginComponent {
     this.authService.login({ email, password }).subscribe({
       next: () => {
         this.loading.set(false);
+        console.log(this.authStore.currentUser());
         this.router.navigate(['/dashboard']);
       },
       error: (err: HttpErrorResponse) => {

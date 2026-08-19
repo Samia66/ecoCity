@@ -2,6 +2,6 @@ export interface NavItem {
   label: string;
   icon: string;
   route: string;
-  roles: string[];
   badge?: number;
+  permission: string
 }

@@ -1,0 +1,34 @@
+<div class="eco-container">
+  <eco-page-header
+    title="Équipes"
+    subtitle="Gérez vos équipes de terrain (2 à 3 agents) et leurs zones d'intervention"
+    icon="groups"
+    [breadcrumbs]="[{ label: 'Dashboard', route: '/dashboard' }, { label: 'Équipes' }]"
+  >
+    <eco-button icon="add" (click)="openCreate()">Nouvelle équipe</eco-button>
+  </eco-page-header>
+
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des équipes..." />
+  } @else if (teams().length === 0) {
+    <eco-empty-state
+      icon="groups"
+      title="Aucune équipe"
+      description="Créez votre première équipe pour commencer à organiser vos agents de terrain."
+      actionLabel="Créer une équipe"
+      (action)="openCreate()"
+    />
+  } @else {
+    <div class="eco-team-grid">
+      @for (team of teams(); track team.id) {
+        <eco-team-card
+          [team]="team"
+          (manageMembers)="openMembers($event)"
+          (assignZone)="openZone($event)"
+          (edit)="openEdit($event)"
+          (remove)="remove($event)"
+        />
+      }
+    </div>
+  }
+</div>

@@ -40,33 +40,11 @@ export class RoleListComponent implements OnInit {
   }
 
   fetch(): void {
-
     this.loading.set(true);
-
     this.roleService.getAll().subscribe({
-
-      next: (res: any) => {
-
-        this.roles.set(
-          res.data.data ?? [],
-        );
-
-        this.loading.set(false);
-
-      },
-
-      error: () => {
-
-        this.roles.set(
-          this.MOCK,
-        );
-
-        this.loading.set(false);
-
-      },
-
+      next: (data) => { this.roles.set(data); this.loading.set(false); },
+      error: () => { this.roles.set(this.MOCK); this.loading.set(false); },
     });
-
   }
 
   remove(role: Role): void {

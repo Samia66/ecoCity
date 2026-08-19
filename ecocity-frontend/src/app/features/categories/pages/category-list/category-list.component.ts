@@ -28,18 +28,7 @@ export class CategoryListComponent implements OnInit {
   loading = signal(true);
   categories = signal<Category[]>([]);
 
-  private readonly MOCK: Category[] = [
-    { id: 'c1', name: 'Dépôts sauvages de déchets', icon: 'delete', reportsCount: 312, createdAt: '2025-10-01' },
-    { id: 'c2', name: 'Poubelles débordantes', icon: 'delete_sweep', reportsCount: 156, createdAt: '2025-10-01' },
-    { id: 'c3', name: 'Éclairage public défectueux', icon: 'lightbulb', reportsCount: 245, createdAt: '2025-10-01' },
-    { id: 'c4', name: 'Nids-de-poule', icon: 'construction', reportsCount: 198, createdAt: '2025-10-01' },
-    { id: 'c5', name: 'Voirie endommagée', icon: 'road', reportsCount: 87, createdAt: '2025-10-01' },
-    { id: 'c6', name: 'Caniveaux bouchés', icon: 'water_damage', reportsCount: 74, createdAt: '2025-10-01' },
-    { id: 'c7', name: "Fuites d'eau", icon: 'water_drop', reportsCount: 143, createdAt: '2025-10-01' },
-    { id: 'c8', name: 'Pollution', icon: 'smoke_free', reportsCount: 61, createdAt: '2025-10-01' },
-    { id: 'c9', name: 'Espaces verts dégradés', icon: 'park', reportsCount: 121, createdAt: '2025-10-01' },
-    { id: 'c10', name: 'Autres problèmes urbains', icon: 'more_horiz', reportsCount: 33, createdAt: '2025-10-01' },
-  ];
+
 
   ngOnInit(): void {
     this.fetch();
@@ -47,16 +36,9 @@ export class CategoryListComponent implements OnInit {
 
   fetch(): void {
     this.loading.set(true);
-
     this.categoryService.getAll().subscribe({
-      next: (res: any) => {
-        this.categories.set(res.data.data ?? []);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.categories.set(this.MOCK);
-        this.loading.set(false);
-      },
+      next: (data) => { this.categories.set(data); this.loading.set(false); },
+      error: () => {  this.loading.set(false); },
     });
   }
 

@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>Membres de l'équipe « {{ data.team.name }} »</h2>
+
+<mat-dialog-content>
+  @if (loading()) {
+    <eco-loading-spinner label="Chargement des agents..." />
+  } @else {
+    <p class="eco-team-members__hint">
+      Sélectionnez entre {{ minMembers }} et {{ maxMembers }} agents pour cette équipe.
+    </p>
+
+    <div class="eco-team-members__count" [class.eco-team-members__count--full]="selectedAgentIds().size >= maxMembers">
+      {{ selectedAgentIds().size }} / {{ maxMembers }} agents sélectionnés
+    </div>
+
+    @if (errorMessage()) {
+      <div class="eco-form-backend-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (agents().length === 0) {
+      <p class="eco-team-members__empty">Aucun agent disponible dans votre organisation.</p>
+    } @else {
+      <div class="eco-team-members__list">
+        @for (agent of agents(); track agent.id) {
+          <label class="eco-team-members__item" [class.eco-team-members__item--disabled]="isDisabled(agent.id)">
+            <mat-checkbox
+              [checked]="isSelected(agent.id)"
+              [disabled]="isDisabled(agent.id)"
+              (change)="toggle(agent.id)"
+            ></mat-checkbox>
+            <div class="eco-team-members__item-info">
+              <span class="eco-team-members__item-name">{{ agent.firstName }} {{ agent.lastName }}</span>
+              <span class="eco-team-members__item-email">{{ agent.email }}</span>
+            </div>
+          </label>
+        }
+      </div>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Annuler</button>
+  <eco-button [loading]="saving()" [disabled]="loading()" (click)="save()">Enregistrer</eco-button>
+</mat-dialog-actions>

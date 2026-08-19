@@ -3,8 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ENDPOINTS } from '../../../core/api/endpoints';
-import { PaginatedResponse, QueryParams } from '../../../core/api/api-response.model';
-import { CreateUserPayload, UserItem } from '../models/user.model';
+import { PaginatedResponse, QueryParams, ApiResponse } from '../../../core/api/api-response.model';
+import { unwrap } from '../../../core/api/unwrap-response.operator';
+import { CreateStaffUserResult, CreateUserPayload, UserItem } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -16,15 +17,16 @@ export class UserService {
   }
 
   getById(id: string): Observable<UserItem> {
-    return this.http.get<UserItem>(`${this.baseUrl}/${id}`);
+    return this.http.get<ApiResponse<UserItem>>(`${this.baseUrl}/${id}`).pipe(unwrap());
   }
 
-  create(payload: CreateUserPayload): Observable<UserItem> {
-    return this.http.post<UserItem>(this.baseUrl, payload);
+  /** Le mot de passe temporaire n'est renvoyé qu'une seule fois, à la création. */
+  create(payload: CreateUserPayload): Observable<CreateStaffUserResult> {
+    return this.http.post<ApiResponse<CreateStaffUserResult>>(this.baseUrl, payload).pipe(unwrap());
   }
 
   update(id: string, payload: Partial<CreateUserPayload>): Observable<UserItem> {
-    return this.http.patch<UserItem>(`${this.baseUrl}/${id}`, payload);
+    return this.http.patch<ApiResponse<UserItem>>(`${this.baseUrl}/${id}`, payload).pipe(unwrap());
   }
 
   delete(id: string): Observable<void> {

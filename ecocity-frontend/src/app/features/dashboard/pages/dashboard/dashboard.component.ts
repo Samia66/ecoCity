@@ -110,49 +110,43 @@ export class DashboardComponent implements OnInit {
   }
 
   fetchSummary(): void {
-
-  this.loading.set(true);
-
-  this.dashboardService.getSummary().subscribe({
-
-    next: (summary) => {
-
-      this.summary.set(summary);
-
-      this.buildCharts(summary);
-
-      this.loading.set(false);
-
-    },
-
-    error: () => {
-
-      this.summary.set(MOCK_SUMMARY);
-
-      this.buildCharts(MOCK_SUMMARY);
-
-      this.loading.set(false);
-
-    },
-
-  });
-
-}
+    this.loading.set(true);
+    this.dashboardService.getSummary().subscribe({
+      next: (data) => {
+        this.summary.set(data);
+        this.buildCharts(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        // Backend indisponible pendant le développement : on garde les données de démonstration
+        this.buildCharts(MOCK_SUMMARY);
+        this.loading.set(false);
+      },
+    });
+  }
 
   private buildCharts(data: DashboardSummary): void {
+    this.barChartData = {
+      labels: data.categoryBreakdown.map((c) => c.category),
+      datasets: [
+        {
+          data: data.categoryBreakdown.map((c) => c.count),
+          backgroundColor: '#16A34A',
+          borderRadius: 6,
+          maxBarThickness: 36,
+        },
+      ],
+    };
 
-  const categoryBreakdown = data?.categoryBreakdown ?? [];
-
-  this.barChartData = {
-    labels: categoryBreakdown.map(c => c.category),
-    datasets: [
-      {
-        data: categoryBreakdown.map(c => c.count),
-        backgroundColor: '#16A34A',
-        borderRadius: 6,
-        maxBarThickness: 36,
-      },
-    ],
-  };
-}
+    this.doughnutChartData = {
+      labels: data.interventionBreakdown.map((i) => i.status),
+      datasets: [
+        {
+          data: data.interventionBreakdown.map((i) => i.count),
+          backgroundColor: ['#7C3AED', '#0EA5E9', '#22C55E', '#EF4444'],
+          borderWidth: 0,
+        },
+      ],
+    };
+  }
 }

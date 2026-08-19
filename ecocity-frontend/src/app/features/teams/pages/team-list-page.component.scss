@@ -1,0 +1,8 @@
+@use "abstracts/spacing" as *;
+
+.eco-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $space-4;
+  align-items: stretch;
+}

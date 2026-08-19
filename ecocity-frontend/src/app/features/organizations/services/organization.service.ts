@@ -3,7 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ENDPOINTS } from '../../../core/api/endpoints';
-import { PaginatedResponse, QueryParams } from '../../../core/api/api-response.model';
+import { PaginatedResponse, QueryParams, ApiResponse } from '../../../core/api/api-response.model';
+import { unwrap } from '../../../core/api/unwrap-response.operator';
 import { CreateOrganizationPayload, Organization } from '../models/organization.model';
 
 @Injectable({ providedIn: 'root' })
@@ -16,15 +17,15 @@ export class OrganizationService {
   }
 
   getById(id: string): Observable<Organization> {
-    return this.http.get<Organization>(`${this.baseUrl}/${id}`);
+    return this.http.get<ApiResponse<Organization>>(`${this.baseUrl}/${id}`).pipe(unwrap());
   }
 
   create(payload: CreateOrganizationPayload): Observable<Organization> {
-    return this.http.post<Organization>(this.baseUrl, payload);
+    return this.http.post<ApiResponse<Organization>>(this.baseUrl, payload).pipe(unwrap());
   }
 
   update(id: string, payload: Partial<CreateOrganizationPayload>): Observable<Organization> {
-    return this.http.patch<Organization>(`${this.baseUrl}/${id}`, payload);
+    return this.http.patch<ApiResponse<Organization>>(`${this.baseUrl}/${id}`, payload).pipe(unwrap());
   }
 
   delete(id: string): Observable<void> {

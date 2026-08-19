@@ -12,6 +12,8 @@ import {
   ResetPasswordPayload,
 } from '../../features/auth/models/auth.model';
 import { ENDPOINTS } from '../api/endpoints';
+import { ApiResponse } from '../api/api-response.model';
+import { unwrap } from '../api/unwrap-response.operator';
 import { TokenService } from './token.service';
 import { AuthStore } from '../store/auth.store';
 
@@ -23,20 +25,23 @@ export class AuthService {
   private baseUrl = environment.apiUrl;
 
   login(payload: LoginPayload): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}${ENDPOINTS.auth.login}`, payload).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.baseUrl}${ENDPOINTS.auth.login}`, payload).pipe(
+      unwrap(),
       tap((res) => this.persistSession(res)),
     );
   }
 
   register(payload: RegisterPayload): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}${ENDPOINTS.auth.register}`, payload).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.baseUrl}${ENDPOINTS.auth.register}`, payload).pipe(
+      unwrap(),
       tap((res) => this.persistSession(res)),
     );
   }
 
   refreshToken(): Observable<AuthTokens> {
     const refreshToken = this.tokenService.getRefreshToken();
-    return this.http.post<AuthTokens>(`${this.baseUrl}${ENDPOINTS.auth.refresh}`, { refreshToken }).pipe(
+    return this.http.post<ApiResponse<AuthTokens>>(`${this.baseUrl}${ENDPOINTS.auth.refresh}`, { refreshToken }).pipe(
+      unwrap(),
       tap((tokens) => this.tokenService.setTokens(tokens.accessToken, tokens.refreshToken)),
     );
   }
@@ -46,19 +51,26 @@ export class AuthService {
   }
 
   forgotPassword(payload: ForgotPasswordPayload): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.baseUrl}${ENDPOINTS.auth.forgotPassword}`, payload);
+    return this.http
+      .post<ApiResponse<{ message: string }>>(`${this.baseUrl}${ENDPOINTS.auth.forgotPassword}`, payload)
+      .pipe(unwrap());
   }
 
   resetPassword(payload: ResetPasswordPayload): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.baseUrl}${ENDPOINTS.auth.resetPassword}`, payload);
+    return this.http
+      .post<ApiResponse<{ message: string }>>(`${this.baseUrl}${ENDPOINTS.auth.resetPassword}`, payload)
+      .pipe(unwrap());
   }
 
   verifyEmail(token: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.baseUrl}${ENDPOINTS.auth.verifyEmail}`, { token });
+    return this.http
+      .post<ApiResponse<{ message: string }>>(`${this.baseUrl}${ENDPOINTS.auth.verifyEmail}`, { token })
+      .pipe(unwrap());
   }
 
   getProfile(): Observable<AuthUser> {
-    return this.http.get<AuthUser>(`${this.baseUrl}${ENDPOINTS.auth.profile}`).pipe(
+    return this.http.get<ApiResponse<AuthUser>>(`${this.baseUrl}${ENDPOINTS.auth.profile}`).pipe(
+      unwrap(),
       tap((user) => this.authStore.updateUser(user)),
     );
   }
@@ -68,20 +80,10 @@ export class AuthService {
     this.authStore.clearSession();
   }
 
-  private persistSession(res: any): void {
-    const data = res.data ?? res;
-
-    this.tokenService.setTokens(
-      data.accessToken,
-      data.refreshToken,
-    );
-
-    this.tokenService.setCurrentUser(
-      data.user,
-    );
-
-    this.authStore.setSession(
-      data.user,
-    );
+  private persistSession(res: LoginResponse): void {
+    this.tokenService.setTokens(res.accessToken, res.refreshToken);
+    this.tokenService.setCurrentUser(res.user);
+    this.authStore.setSession(res.user);
   }
 }
+

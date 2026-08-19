@@ -1,0 +1,568 @@
+// ============================================================================
+// EcoCity — Schéma Prisma
+// Plateforme de gestion des signalements urbains (NestJS + PostgreSQL)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ReportStatus {
+  NOUVEAU
+  EN_ATTENTE
+  VALIDE
+  ASSIGNE
+  EN_COURS
+  RESOLU
+  REJETE
+  ARCHIVE
+}
+
+enum ReportPriority {
+  BASSE
+  MOYENNE
+  HAUTE
+  CRITIQUE
+}
+
+enum InterventionStatus {
+  ASSIGNEE
+  ACCEPTEE
+  EN_COURS
+  TERMINEE
+  REJETEE
+  ANNULEE
+}
+
+enum InterventionPhotoPhase {
+  AVANT
+  APRES
+}
+
+enum NotificationType {
+  REPORT_CREATED
+  REPORT_ASSIGNED
+  REPORT_STATUS_CHANGED
+  INTERVENTION_ASSIGNED
+  INTERVENTION_STATUS_CHANGED
+  COMMENT_ADDED
+  SYSTEM
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  STATUS_CHANGE
+  ASSIGN
+}
+
+// ============================================================================
+// ORGANIZATION
+// ============================================================================
+
+model Organization {
+  id      String @id @default(cuid())
+  name    String
+  city    String
+  address String?
+  phone   String?
+  email   String?
+  logoUrl String?
+  active  Boolean @default(true)
+
+  users            User[]
+  reports          Report[]
+  categories       Category[]
+  zones            Zone[]
+  teamMemberships  TeamMembership[]
+  teams            Team[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([city])
+}
+
+// ============================================================================
+// ROLE / PERMISSION (RBAC dynamique — matrice éditable côté Angular)
+// ============================================================================
+
+model Role {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+  isSystem    Boolean @default(false)
+
+  users       User[]
+  permissions Permission[] @relation("RolePermissions")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id     String @id @default(cuid())
+  code   String @unique
+  label  String
+  module String
+
+  roles Role[] @relation("RolePermissions")
+
+  createdAt DateTime @default(now())
+}
+
+// ============================================================================
+// USER — modèle imposé, ne pas modifier les champs/relations nommées
+// ============================================================================
+
+model User {
+  id                  String     @id @default(cuid())
+  organizationId      String
+  roleId              String
+  firstName           String
+  lastName            String
+  email               String     @unique
+  phone               String?
+  password            String
+  mustChangePassword  Boolean    @default(false)
+  avatarUrl           String?
+  status              UserStatus @default(ACTIVE)
+  isEmailVerified     Boolean    @default(false)
+  emailVerifiedAt     DateTime?
+  lastLoginAt         DateTime?
+  failedLoginAttempts Int        @default(0)
+  lockedUntil         DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  refreshTokens           RefreshToken[]
+  reports                 Report[]                 @relation("ReportAuthor")
+  assignedReports          Report[]                 @relation("AssignedReports")
+  comments                 ReportComment[]          @relation("UserComments")
+  interventions             Intervention[]           @relation("AgentInterventions")
+  notifications             Notification[]           @relation("UserNotifications")
+  auditLogs                 AuditLog[]                @relation("UserAuditLogs")
+  passwordResetTokens        PasswordResetToken[]
+  emailVerificationTokens     EmailVerificationToken[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([organizationId])
+  @@index([roleId])
+  @@index([email])
+  @@index([status])
+}
+
+// ============================================================================
+// AUTH SUPPORT TABLES
+// ============================================================================
+
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  replacedBy  String?
+  createdByIp String?
+  userAgent   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+// ============================================================================
+// CATEGORY
+// ============================================================================
+
+model Category {
+  id             String  @id @default(cuid())
+  name           String
+  icon           String  @default("category")
+  organizationId String?
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  reports      Report[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([organizationId])
+}
+
+// ============================================================================
+// REPORT (signalement)
+// ============================================================================
+
+model Report {
+  id             String         @id @default(cuid())
+  title          String
+  description    String
+  categoryId     String
+  priority       ReportPriority @default(MOYENNE)
+  status         ReportStatus   @default(NOUVEAU)
+  address        String
+  latitude       Float?
+  longitude      Float?
+  organizationId String
+  authorId       String
+  assignedToId   String?
+  zoneId         String?
+
+  category     Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  author       User         @relation("ReportAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  assignedTo   User?        @relation("AssignedReports", fields: [assignedToId], references: [id], onDelete: SetNull)
+  zone         Zone?        @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  attachments   ReportAttachment[]
+  comments      ReportComment[]
+  history       ReportStatusHistory[]
+  intervention  Intervention?
+  notifications Notification[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([organizationId])
+  @@index([authorId])
+  @@index([assignedToId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([priority])
+  @@index([zoneId])
+}
+
+model ReportAttachment {
+  id       String  @id @default(cuid())
+  reportId String
+  url      String
+  filename String
+  mimeType String?
+  sizeKb   Int?
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
+}
+
+model ReportComment {
+  id       String @id @default(cuid())
+  reportId String
+  authorId String
+  message  String
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  author User   @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
+  @@index([authorId])
+}
+
+/// Historique des changements de statut d'un signalement.
+/// `changedById`/`changedByName` sont dénormalisés (pas de relation Prisma
+/// vers User) afin de ne pas modifier le modèle User imposé par le cahier
+/// des charges.
+model ReportStatusHistory {
+  id            String       @id @default(cuid())
+  reportId      String
+  status        ReportStatus
+  comment       String?
+  changedById   String
+  changedByName String
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
+}
+
+// ============================================================================
+// INTERVENTION
+// ============================================================================
+
+model Intervention {
+  id       String              @id @default(cuid())
+  reportId String              @unique
+  agentId  String
+  status   InterventionStatus  @default(ASSIGNEE)
+
+  /// Dénormalisé (pas de relation Prisma vers User) — voir note ci-dessus.
+  assignedById   String
+  assignedByName String
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  agent  User   @relation("AgentInterventions", fields: [agentId], references: [id], onDelete: Restrict)
+
+  history     InterventionStatusHistory[]
+  attachments InterventionAttachment[]
+  comments    InterventionComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([agentId])
+  @@index([status])
+}
+
+model InterventionAttachment {
+  id             String                 @id @default(cuid())
+  interventionId String
+  url            String
+  filename       String
+  phase          InterventionPhotoPhase
+
+  intervention Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([interventionId])
+}
+
+/// `authorId`/`authorName` dénormalisés — pas de relation Prisma vers User
+/// (modèle User imposé, cf. note sur ReportStatusHistory plus haut).
+model InterventionComment {
+  id             String @id @default(cuid())
+  interventionId String
+  authorId       String
+  authorName     String
+  message        String
+
+  intervention Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([interventionId])
+}
+
+model InterventionStatusHistory {
+  id             String              @id @default(cuid())
+  interventionId String
+  status         InterventionStatus
+  comment        String?
+  changedById    String
+  changedByName  String
+
+  intervention Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([interventionId])
+}
+
+// ============================================================================
+// NOTIFICATION
+// ============================================================================
+
+model Notification {
+  id       String            @id @default(cuid())
+  userId   String
+  type     NotificationType
+  title    String
+  message  String
+  reportId String?
+  readAt   DateTime?
+
+  user   User    @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  report Report? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([reportId])
+}
+
+// ============================================================================
+// ZONE — découpage géographique d'une organisation, agents assignés
+// ============================================================================
+
+model Zone {
+  id             String  @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignments  ZoneAssignment[]
+  reports      Report[]
+  teams        Team[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([organizationId])
+}
+
+/// Agents assignés à une zone. `agentId`/`agentName` sont dénormalisés (pas
+/// de relation Prisma vers User) pour ne pas modifier le modèle User imposé.
+model ZoneAssignment {
+  id        String @id @default(cuid())
+  zoneId    String
+  agentId   String
+  agentName String
+
+  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([zoneId, agentId])
+  @@index([agentId])
+}
+
+// ============================================================================
+// TEAM MEMBERSHIP — rattachement d'un AGENT à un TEAM_LEADER
+// ============================================================================
+
+/// Un agent est rattaché à au plus un chef d'équipe à la fois.
+/// `teamLeaderId`/`agentId` sont dénormalisés (pas de relation Prisma vers
+/// User) pour ne pas modifier le modèle User imposé.
+model TeamMembership {
+  id             String @id @default(cuid())
+  teamLeaderId   String
+  teamLeaderName String
+  agentId        String @unique
+  agentName      String
+  organizationId String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamLeaderId])
+  @@index([organizationId])
+}
+
+// ============================================================================
+// TEAM — équipe de terrain nommée (2 à 3 agents), affectable à une zone
+// ============================================================================
+
+model Team {
+  id             String  @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+  zoneId         String?
+
+  /// Chef d'équipe créateur — dénormalisé (pas de relation Prisma vers User,
+  /// modèle User imposé, cf. note sur ReportStatusHistory plus haut).
+  createdById   String
+  createdByName String
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  zone         Zone?        @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  members      TeamMember[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([organizationId])
+  @@index([zoneId])
+}
+
+/// `agentId`/`agentName`/`agentEmail` dénormalisés (pas de relation Prisma
+/// vers User) pour ne pas modifier le modèle User imposé.
+model TeamMember {
+  id         String @id @default(cuid())
+  teamId     String
+  agentId    String
+  agentName  String
+  agentEmail String
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, agentId])
+  @@index([teamId])
+  @@index([agentId])
+}
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  userId     String
+  action     AuditAction
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+
+  user User @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+}

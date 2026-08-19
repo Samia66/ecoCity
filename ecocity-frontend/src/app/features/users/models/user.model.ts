@@ -18,5 +18,11 @@ export interface CreateUserPayload {
   email: string;
   role: UserRole;
   organizationId?: string;
-  password?: string;
+  phone?: string;
+}
+
+/** Réponse de création d'un compte staff : le mot de passe temporaire n'est renvoyé qu'une seule fois. */
+export interface CreateStaffUserResult {
+  user: UserItem;
+  temporaryPassword: string;
 }
