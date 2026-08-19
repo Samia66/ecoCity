@@ -1,3 +1,10 @@
+# Infrastructure CIBLE (roadmap) : Redis (cache), MinIO (stockage objet des
+# pièces jointes) et Mailpit (emails transactionnels) ne sont pas encore
+# utilisés par ecocity-backend — voir la note dans ecocity-backend/README.md.
+# Pour le développement actuel, utilisez plutôt ecocity-backend/docker-compose.yml
+# (Postgres seul), qui correspond à ce que le code lit réellement.
+# Ce fichier nécessite un .env avec POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB,
+# MINIO_ROOT_USER/MINIO_ROOT_PASSWORD, MAILPIT_HTTP_PORT/MAILPIT_SMTP_PORT.
 services:
 
   postgres:

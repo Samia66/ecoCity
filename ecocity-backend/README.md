@@ -15,6 +15,16 @@ et l'**application mobile Flutter** (citoyens, agents, chefs d'équipe).
 
 ## Démarrage rapide
 
+> **Note sur les fichiers `docker-compose.yml`** — le dépôt en contient deux :
+> celui-ci (`ecocity-backend/docker-compose.yml`), qui ne lance que **Postgres**,
+> est le seul actuellement utilisé par le code (voir `src/config/configuration.ts` :
+> aucune variable Redis/MinIO/SMTP n'y est lue). Celui d'
+> `infrastructure/docker/docker-compose.yml` (Postgres + Redis + MinIO + Mailpit)
+> décrit l'infrastructure cible pour de futures fonctionnalités (cache, stockage
+> objet des pièces jointes, emails transactionnels — cf. le `TODO(email)` dans
+> `auth.service.ts`) mais n'est pas encore branché : ne le lancez pas tant que ces
+> intégrations ne sont pas implémentées côté NestJS, il ne servirait à rien.
+
 ```bash
 # 1. Base de données (Docker fourni, ou une instance Postgres existante)
 docker compose up -d

@@ -11,9 +11,13 @@ export function generateTempPassword(length = 12): string {
   for (let i = 0; i < length; i++) {
     password += CHARSET[Math.floor(Math.random() * CHARSET.length)];
   }
-  // Garantit au moins un caractère spécial pour la robustesse.
+  // Garantit au moins un caractère spécial pour la robustesse (substitution, pas insertion,
+  // pour préserver la longueur demandée).
   const special = '!@#$%';
   const insertAt = Math.floor(Math.random() * password.length);
-  password = password.slice(0, insertAt) + special[Math.floor(Math.random() * special.length)] + password.slice(insertAt);
+  password =
+    password.slice(0, insertAt) +
+    special[Math.floor(Math.random() * special.length)] +
+    password.slice(insertAt + 1);
   return password.replace(AMBIGUOUS_CHARS, 'x');
 }

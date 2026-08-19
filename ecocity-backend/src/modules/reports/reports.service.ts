@@ -106,6 +106,18 @@ export class ReportsService {
       },
     });
 
+    if (photo) {
+      await this.repository.addAttachment({
+        report: { connect: { id: report.id } },
+        url: toPublicFileUrl(this.appConfig.publicUrl, 'reports', photo.filename),
+        filename: photo.originalname,
+        mimeType: photo.mimetype,
+        sizeKb: Math.round(photo.size / 1024),
+      });
+      const withPhoto = await this.repository.findById(report.id);
+      return this.mapper.toDetailDto(withPhoto!);
+    }
+
     return this.mapper.toDetailDto(report);
   }
 
@@ -153,7 +165,7 @@ export class ReportsService {
 
     const updated = await this.repository.update(id, data);
 
-    return this.mapper.toDetailDto(report);
+    return this.mapper.toDetailDto(updated);
   }
 
   async updateStatus(id: string, dto: UpdateReportStatusDto, requester: AuthenticatedUser): Promise<ReportDto> {
@@ -162,7 +174,7 @@ export class ReportsService {
     this.assertCanManage(report, requester);
     this.assertValidTransition(report.status, dto.status);
 
-    const updated = await this.repository.update(id, { status: dto.status });
+    await this.repository.update(id, { status: dto.status });
     await this.repository.addStatusHistory({
       report: { connect: { id } },
       status: dto.status,
